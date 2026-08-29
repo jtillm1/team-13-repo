@@ -1,7 +1,7 @@
 ## Title
-> Your project title
+> MealShare
 
 ## Team Members
-> Team Member #1 name
+> Cali Hunt
 
-> Team Member #2 name
+> Jace Tillman

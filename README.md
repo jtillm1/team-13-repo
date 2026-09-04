@@ -14,9 +14,5 @@
     2. View available services - View available home cooks / caterers and previous meals they’ve made
     3. Subscribe to available services - Order one time meals or subscribe to a weekly meal plan option
     4. Write reviews for subscribed services - Leave reviews and ratings on home cooks and the meals they’ve cooked
-2. Provider (the user with the provider role):
-    1. Create/modify/remove provider profile - Register as a provider, set menu/prices.
-    2. Create services - Display menu, Show subscription plans. .
-    3. View customer statistics -  View how many customers have orders, view who all still needs to pay. Whether its a subscription or a one day meal. 
-    4. Reply to reviews - Be able to reply to reviews from customers.
+
 

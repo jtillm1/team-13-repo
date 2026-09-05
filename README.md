@@ -16,3 +16,8 @@
     4. Write reviews for subscribed services - Leave reviews and ratings on home cooks and the meals they’ve cooked
 
 
+
+## Team Members
+> Cali Hunt
+
+> Jace Tillman

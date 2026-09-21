@@ -1,4 +1,9 @@
+/* =========================================
+   FitMatch - Shared Stylesheet
+   Used by all customer pages
+   ========================================= */
 
+/* Google Fonts - Fraunces for headings, Inter for body text */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
@@ -183,6 +188,17 @@ a {
   color: #fff;
 }
 
+.btn-outline-light {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #fff;
+}
+
 .btn-block {
   width: 100%;
 }
@@ -247,6 +263,46 @@ a {
   color: #fff;
   font-family: 'Fraunces', serif;
   font-size: 1.6rem;
+}
+
+/* Placeholder "photo" blocks - since there's no image backend yet,
+   an emoji on a colored background stands in for a real photo. */
+.photo-block {
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+}
+
+.photo-block.chef {
+  background: var(--color-primary);
+}
+
+.photo-block.meal {
+  background: var(--color-accent);
+}
+
+/* Preview cards used on the landing page for featured cooks/meals */
+.preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.preview-card .photo-block {
+  height: 130px;
+}
+
+.preview-card h4 {
+  margin-bottom: 0;
+}
+
+.preview-card .preview-sub {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }
 
 .tag-row {

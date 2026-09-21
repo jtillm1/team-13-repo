@@ -1,0 +1,454 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Color palette */
+  --color-bg: #faf7f2;          /* warm cream background */
+  --color-surface: #ffffff;      /* card / panel background */
+  --color-primary: #22402d;      /* deep forest green */
+  --color-primary-light: #34573d;
+  --color-accent: #d9a441;       /* warm gold accent */
+  --color-text: #2b2620;         /* charcoal text */
+  --color-text-muted: #6b6459;
+  --color-border: #e5ddce;
+  --color-success-bg: #eef4ec;
+  --color-success-text: #22402d;
+
+  --radius: 10px;
+  --max-width: 1100px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Fraunces', serif;
+  color: var(--color-primary);
+  margin: 0 0 0.5em 0;
+  line-height: 1.2;
+}
+
+p {
+  margin: 0 0 1em 0;
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-primary);
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- Navigation bar ---------- */
+.navbar {
+  background: var(--color-primary);
+  padding: 16px 0;
+}
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.navbar .logo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+}
+
+.navbar .logo span {
+  color: var(--color-accent);
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.nav-links a {
+  color: #f2ede3;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.nav-links a:hover {
+  color: var(--color-accent);
+}
+
+.nav-links .pill {
+  background: var(--color-accent);
+  color: var(--color-primary);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* ---------- Page sections / layout helpers ---------- */
+.page-section {
+  padding: 48px 0;
+}
+
+.page-section.tight {
+  padding: 28px 0;
+}
+
+.section-heading {
+  margin-bottom: 24px;
+}
+
+.section-heading p {
+  color: var(--color-text-muted);
+  max-width: 60ch;
+}
+
+/* ---------- Hero (used on login/register) ---------- */
+.hero {
+  background: var(--color-primary);
+  color: #fff;
+  padding: 56px 0;
+}
+
+.hero h1 {
+  color: #fff;
+}
+
+.hero p {
+  color: #e7e0d0;
+  max-width: 55ch;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 22px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-light);
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--color-primary);
+}
+
+.btn-accent:hover {
+  opacity: 0.9;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+}
+
+.btn-outline:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-small {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 900px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-3, .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .navbar .container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Cook card (browse page) */
+.cook-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cook-card .cook-photo {
+  width: 100%;
+  height: 140px;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.rating {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+/* ---------- Forms ---------- */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  background: #fff;
+  color: var(--color-text);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checkbox-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.85rem;
+  background: #fff;
+}
+
+.form-card {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.form-footer-text {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Filter bar (browse page) ---------- */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 28px;
+}
+
+.filter-bar .form-group {
+  margin-bottom: 0;
+  min-width: 180px;
+}
+
+/* ---------- Order summary box ---------- */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ---------- Star rating ---------- */
+.star-picker {
+  font-size: 2rem;
+  color: var(--color-border);
+  display: flex;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.star-picker span.selected {
+  color: var(--color-accent);
+}
+
+/* ---------- Dashboard table-ish list ---------- */
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.status-delivered {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.status-active {
+  background: #fdf3e0;
+  color: #8a5c11;
+}
+
+/* ---------- Confirmation banner ---------- */
+.confirm-box {
+  text-align: center;
+  padding: 56px 24px;
+}
+
+.confirm-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-success-bg);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 20px auto;
+}
+
+/* ---------- Review list ---------- */
+.review {
+  border-bottom: 1px solid var(--color-border);
+  padding: 16px 0;
+}
+
+.review:last-child {
+  border-bottom: none;
+}
+
+.review-stars {
+  color: var(--color-accent);
+  font-size: 1rem;
+}
+
+/* ---------- Footer ---------- */
+footer {
+  border-top: 1px solid var(--color-border);
+  padding: 24px 0;
+  margin-top: 40px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}

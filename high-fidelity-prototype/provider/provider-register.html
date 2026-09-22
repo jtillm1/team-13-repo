@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <!-- Nav bar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="../index.html" class="logo">Meal<span>Share</span></a>
+    </div>
+  </nav>
+
+  <section class="hero page-section tight">
+    <div class="container">
+      <h1>Create your account</h1>
+      <p>Tell us a bit about your cooking preferences, to help us display your profile to the right customers.</p>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="container">
+      <div class="card form-card">
+
+        <!-- US-1: Registration form. No backend, so we just save this
+             to localStorage and pretend the account was created. -->
+        <form id="register-form">
+
+          <div class="form-group">
+            <label for="first-name">First name</label>
+            <input type="text" id="first-name" required placeholder="Jordan" />
+          </div>
+
+          <div class="form-group">
+            <label for="last-name">Last name</label>
+            <input type="text" id="last-name" required placeholder="Lee" />
+          </div>
+
+          <div class="form-group">
+            <label for="business-name">Business name</label>
+            <input type="text" id="business-name" required placeholder="Lee's Kitchen" />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" required placeholder="jordan@email.com" />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" required placeholder="••••••••" />
+          </div>
+
+          <div class="form-group">
+            <label for="confirm-password">Confirm password</label>
+            <input type="password" id="confirm-password" required placeholder="••••••••" />
+          </div>
+
+          <p id="error-message" style="color:#b00020; display:none;"></p>
+
+          <button type="submit" class="btn btn-primary btn-block">Create account</button>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype - CSC 340 Milestone 2</p>
+  </footer>
+
+  <script src="../js/customer.js"></script>
+  <script>
+    // Handle the sign-up form. There's no backend, so we just
+    // check the passwords match and save the user to localStorage.
+    document.getElementById("register-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+      const errorEl = document.getElementById("error-message");
+
+      if (password !== confirmPassword) {
+        errorEl.textContent = "Passwords do not match. Please try again.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      const dietChecks = document.querySelectorAll('input[name="diet"]:checked');
+      const cuisineChecks = document.querySelectorAll('input[name="cuisine"]:checked');
+
+      const user = {
+        firstName: document.getElementById("first-name").value,
+        lastName: document.getElementById("last-name").value,
+        email: document.getElementById("email").value,
+        diet: Array.from(dietChecks).map(c => c.value),
+        cuisine: Array.from(cuisineChecks).map(c => c.value)
+      };
+
+      // Simulate account creation - just store it locally
+      saveUser(user);
+
+      // Go straight to the dashboard, as if the customer just logged in
+      window.location.href = "customer-dashboard.html";
+    });
+  </script>
+</body>
+</html>

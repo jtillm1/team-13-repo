@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitMatch</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="logo">Fit<span>Match</span></a>
+    </div>
+  </nav>
+
+  <section class="hero page-section">
+    <div class="container">
+      <h1>FitMatch</h1>
+      <p>Order home-cooked meals and meal plans from local cooks who match your cuisine and dietary preferences.</p>
+      <div style="display:flex; gap:12px; margin-top: 20px; flex-wrap: wrap;">
+        <a href="customer/customer-register.html" class="btn btn-accent">Sign Up as a Customer</a>
+        <a href="provider/provider-register.html" class="btn btn-outline-light">Sign Up as a Cook</a>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page-section tight">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Meet a few of our cooks</h2>
+        <p>Home cooks and caterers near you, rated by real customers.</p>
+      </div>
+      <div class="grid grid-3" id="cook-preview-grid"></div>
+      <p style="margin-top:16px;"><a href="customer/browse-cooks.html">Browse all cooks &rarr;</a></p>
+    </div>
+  </section>
+
+
+  <section class="page-section tight">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Popular meals this week</h2>
+        <p>A taste of what you can order once you sign up.</p>
+      </div>
+      <div class="grid grid-3" id="meal-preview-grid"></div>
+    </div>
+  </section>
+
+  <section class="page-section tight">
+    <div class="container">
+      <p style="color: var(--color-text-muted);">
+        This is a high-fidelity prototype for CSC 340, Milestone 2. The customer side is in the
+        <code>customer/</code> folder. The provider/cook side is being built separately by a teammate.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>FitMatch demo prototype - CSC 340 Milestone 2</p>
+  </footer>
+
+  <script src="js/customer.js"></script>
+  <script>
+    // Show a handful of cooks as a preview, each linking straight to their profile
+    const cookGrid = document.getElementById("cook-preview-grid");
+    COOKS.forEach(cook => {
+      const card = document.createElement("a");
+      card.className = "card preview-card";
+      card.href = "customer/cook-profile.html?cook=" + cook.id;
+      card.innerHTML = `
+        <div class="photo-block chef">${cook.emoji}</div>
+        <h4>${cook.name}</h4>
+        <span class="rating">&#9733; ${cook.rating}</span>
+        <div class="tag-row">
+          <span class="tag">${cook.cuisine}</span>
+          <span class="tag">${cook.diet[0]}</span>
+        </div>
+      `;
+      cookGrid.appendChild(card);
+    });
+
+    // Show one meal from each cook as a preview
+    const mealGrid = document.getElementById("meal-preview-grid");
+    COOKS.forEach(cook => {
+      const meal = cook.meals[0];
+      const card = document.createElement("a");
+      card.className = "card preview-card";
+      card.href = "customer/cook-profile.html?cook=" + cook.id;
+      card.innerHTML = `
+        <div class="photo-block meal">${meal.emoji}</div>
+        <h4>${meal.name}</h4>
+        <span class="preview-sub">${cook.name} &middot; <span class="rating">&#9733; ${cook.rating}</span></span>
+        <p style="font-weight:700; color:var(--color-primary); margin:0;">$${meal.price}</p>
+      `;
+      mealGrid.appendChild(card);
+    });
+  </script>
+</body>
+</html>

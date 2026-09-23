@@ -18,7 +18,7 @@
   <section class="hero page-section tight">
     <div class="container">
       <h1>Create your account</h1>
-      <p>Tell us a bit about your taste so we can match you with the right home cooks.</p>
+      <p>Tell us a bit about your cooking preferences, to help us display your profile to the right customers.</p>
     </div>
   </section>
 
@@ -41,6 +41,11 @@
           </div>
 
           <div class="form-group">
+            <label for="business-name">Business name</label>
+            <input type="text" id="business-name" required placeholder="Lee's Kitchen" />
+          </div>
+
+          <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" required placeholder="jordan@email.com" />
           </div>
@@ -53,28 +58,6 @@
           <div class="form-group">
             <label for="confirm-password">Confirm password</label>
             <input type="password" id="confirm-password" required placeholder="••••••••" />
-          </div>
-
-          <div class="form-group">
-            <label>Dietary preferences</label>
-            <div class="checkbox-row">
-              <label class="checkbox-pill"><input type="checkbox" name="diet" value="Vegetarian" /> Vegetarian</label>
-              <label class="checkbox-pill"><input type="checkbox" name="diet" value="Vegan" /> Vegan</label>
-              <label class="checkbox-pill"><input type="checkbox" name="diet" value="Gluten-Free" /> Gluten-Free</label>
-              <label class="checkbox-pill"><input type="checkbox" name="diet" value="Dairy-Free" /> Dairy-Free</label>
-              <label class="checkbox-pill"><input type="checkbox" name="diet" value="High-Protein" /> High-Protein</label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Cuisine preferences</label>
-            <div class="checkbox-row">
-              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="Italian" /> Italian</label>
-              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="Mexican" /> Mexican</label>
-              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="American" /> American</label>
-              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="Asian" /> Asian</label>
-              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="Mediterranean" /> Mediterranean</label>
-            </div>
           </div>
 
           <p id="error-message" style="color:#b00020; display:none;"></p>

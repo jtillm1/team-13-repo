@@ -13,12 +13,12 @@ const COOKS = [
     cuisine: "Italian",
     diet: ["Vegetarian", "Gluten-Free"],
     rating: 4.8,
-    //emoji: "\uD83C\uDF5D", // used as a placeholder "photo" since there's no image backend
+    image: "maria.jpg",
     bio: "Home-style Italian cooking made with fresh, seasonal ingredients. Family recipes passed down three generations.",
     meals: [
-      { id: "lasagna", name: "Lasagna", price: 14, /*emoji: "\uD83C\uDF5D",*/ desc: "Layers of pasta, ricotta, and slow-simmered tomato sauce." },
-      { id: "primavera", name: "Pasta Primavera", price: 12, emoji: "\uD83C\uDF5D", desc: "Fresh vegetables tossed with pasta in a light garlic sauce." },
-      { id: "parm", name: "Chicken Parmesan", price: 15, emoji: "\uD83C\uDF5D", desc: "Breaded chicken breast, marinara, and melted mozzarella." }
+      { id: "lasagna", name: "Lasagna", price: 14, image: "lasagna.jpg", desc: "Layers of pasta, ricotta, and slow-simmered tomato sauce." },
+      { id: "primavera", name: "Pasta Primavera", price: 12, image: "pasta-primavera.jpg", desc: "Fresh vegetables tossed with pasta in a light garlic sauce." },
+      { id: "parm", name: "Chicken Parmesan", price: 15, image: "chicken-parmesan.jpg", desc: "Breaded chicken breast, marinara, and melted mozzarella." }
     ]
   },
   {
@@ -27,11 +27,11 @@ const COOKS = [
     cuisine: "American",
     diet: ["High-Protein", "Dairy-Free"],
     rating: 4.7,
-    //emoji: "\uD83C\uDF57",
+    image: "james.jpg",
     bio: "Weekly meal prep built for people who train hard. Balanced macros, no fuss.",
     meals: [
-      { id: "chicken-rice", name: "Grilled Chicken & Rice Bowl", price: 11, /*emoji: "\uD83C\uDF57",*/ desc: "Grilled chicken breast, brown rice, and steamed broccoli." },
-      { id: "turkey-bowl", name: "Turkey Taco Bowl", price: 12, emoji: "\uD83C\uDF57", desc: "Seasoned ground turkey, peppers, and cilantro-lime rice." }
+      { id: "chicken-rice", name: "Grilled Chicken & Rice Bowl", price: 11, image: "chicken-rice-bowl.jpg", desc: "Grilled chicken breast, brown rice, and steamed broccoli." },
+      { id: "turkey-bowl", name: "Turkey Taco Bowl", price: 12, image: "turkey-taco-bowl.jpg", desc: "Seasoned ground turkey, peppers, and cilantro-lime rice." }
     ]
   },
   {
@@ -40,11 +40,11 @@ const COOKS = [
     cuisine: "Mexican",
     diet: ["Vegetarian"],
     rating: 4.9,
-    //emoji: "\uD83C\uDF2E",
+    image: "sofia.jpg",
     bio: "Bright, veggie-forward Mexican dishes made from scratch every morning.",
     meals: [
-      { id: "veg-enchiladas", name: "Veggie Enchiladas", price: 13, /*emoji: "\uD83C\uDF2E",*/ desc: "Corn tortillas filled with roasted vegetables and cheese." },
-      { id: "bean-tacos", name: "Black Bean Tacos", price: 10, emoji: "\uD83C\uDF2E", desc: "Soft tacos with seasoned black beans and pico de gallo." }
+      { id: "veg-enchiladas", name: "Veggie Enchiladas", price: 13, image: "veggie-enchiladas.jpg", desc: "Corn tortillas filled with roasted vegetables and cheese." },
+      { id: "bean-tacos", name: "Black Bean Tacos", price: 10, image: "black-bean-tacos.jpg", desc: "Soft tacos with seasoned black beans and pico de gallo." }
     ]
   },
   {
@@ -53,11 +53,11 @@ const COOKS = [
     cuisine: "Asian",
     diet: ["Vegan", "Gluten-Free"],
     rating: 4.8,
-    // emoji: "\uD83C\uDF5C",
+    image: "hana.jpg",
     bio: "Plant-based Asian comfort food, made gluten-free without losing any flavor.",
     meals: [
-      { id: "veg-stirfry", name: "Vegetable Stir-Fry", price: 12, /*emoji: "\uD83C\uDF5C",*/ desc: "Seasonal vegetables tossed in a gluten-free tamari sauce over rice." },
-      { id: "tofu-curry", name: "Tofu Curry", price: 13, emoji: "\uD83C\uDF5C", desc: "Crispy tofu simmered in a coconut curry sauce." }
+      { id: "veg-stirfry", name: "Vegetable Stir-Fry", price: 12, image: "veggie-stirfry.jpg", desc: "Seasonal vegetables tossed in a gluten-free tamari sauce over rice." },
+      { id: "tofu-curry", name: "Tofu Curry", price: 13, image: "tofu-curry.jpg", desc: "Crispy tofu simmered in a coconut curry sauce." }
     ]
   }
 ];

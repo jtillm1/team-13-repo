@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dashboard | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="customer-dashboard.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="browse-cooks.html">Browse Cooks</a></li>
+        <li><a href="customer-dashboard.html">Dashboard</a></li>
+        <li><a href="customer-settings.html">Settings</a></li>
+        <li class="pill">Hi, <span id="nav-user-name">Guest</span></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container">
+      <div class="section-heading">
+        <h1>My Dashboard</h1>
+        <p>Your profile, and every meal or subscription you've ordered through MealShare.</p>
+      </div>
+
+      <!-- Profile summary card -->
+      <div class="card" style="margin-bottom: 28px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 id="profile-name">Customer</h3>
+            <p id="profile-email" style="color: var(--color-text-muted); margin-bottom: 12px;"></p>
+          </div>
+          <a href="customer-settings.html" class="btn btn-outline btn-small">Settings</a>
+        </div>
+        <div class="tag-row" id="profile-diet"></div>
+        <div class="tag-row" id="profile-cuisine" style="margin-top: 8px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section tight">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Order history</h2>
+        <p>One-time orders and meal plan subscriptions you've placed.</p>
+      </div>
+
+      <div class="card">
+        <div id="order-list">
+          <!-- Orders are inserted here by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype - CSC 340 Milestone 2</p>
+  </footer>
+
+  <script src="../js/customer.js"></script>
+  <script>
+    // Draws the profile card from whatever is in localStorage
+    const user = getUser();
+    const dietEl = document.getElementById("profile-diet");
+    const cuisineEl = document.getElementById("profile-cuisine");
+
+    if (user) {
+      document.getElementById("profile-name").textContent = user.firstName + " " + user.lastName;
+      document.getElementById("profile-email").textContent = user.email;
+
+      (user.diet || []).forEach(d => {
+        dietEl.innerHTML += `<span class="tag">${d}</span>`;
+      });
+      (user.cuisine || []).forEach(c => {
+        cuisineEl.innerHTML += `<span class="tag">${c}</span>`;
+      });
+    } else {
+      document.getElementById("profile-name").textContent = "Guest customer";
+      document.getElementById("profile-email").textContent = "Sign up to save your preferences.";
+    }
+
+    // Build the order history list from localStorage
+    const orders = getOrders();
+    const orderListEl = document.getElementById("order-list");
+
+    if (orders.length === 0) {
+      orderListEl.innerHTML = "<p>You haven't placed any orders yet. <a href='browse-cooks.html'>Browse cooks</a> to get started.</p>";
+    } else {
+      orders.slice().reverse().forEach(order => {
+        const item = document.createElement("div");
+        item.className = "order-item";
+
+        const statusClass = order.status === "Delivered" ? "status-delivered" : "status-active";
+
+        // Only show "Leave a Review" for delivered orders that haven't been reviewed yet
+        let reviewButton = "";
+        if (order.status === "Delivered" && !order.reviewed) {
+          reviewButton = `<a class="btn btn-accent btn-small" href="review-form.html?order=${order.id}">Leave a Review</a>`;
+        } else if (order.reviewed) {
+          reviewButton = `<span style="color: var(--color-text-muted); font-size: 0.85rem;">Review submitted</span>`;
+        }
+
+        item.innerHTML = `
+          <div>
+            <strong>${order.mealName}</strong> - ${order.cookName}<br />
+            <span style="color: var(--color-text-muted); font-size: 0.9rem;">
+              ${order.orderType} &middot; Qty ${order.quantity} &middot; ${order.date} &middot; $${order.total}
+            </span>
+          </div>
+          <div style="display:flex; align-items:center; gap: 12px;">
+            <span class="status-badge ${statusClass}">${order.status}</span>
+            ${reviewButton}
+          </div>
+        `;
+        orderListEl.appendChild(item);
+      });
+    }
+  </script>
+</body>
+</html>

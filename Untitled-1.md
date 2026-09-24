@@ -1,4 +1,4 @@
-Project Name: FitMatch 
+Project Name: MealShare 
 Team: Jace Tillman - Provider, Cali Hunt - Customer 
 Course: CSC 340 
 Version: 1.0 
@@ -70,35 +70,35 @@ Then the review should be saved and visible to other customers
 
 2.2: Provider (Cook) Stories
 
-US-5 - Create and update a catering profile
-
-Scenario: Creating and updating the catering profile
-Given I have not created/updated my profile
-When I enter the information into the registration
-Then the profile will be saved and displayed to customers. 
+US-5 -
 
 
-US-6 - Display meals and set pricing
-
-Scenario: Displaying meals and setting pricing. 
-Given I have a profile
-When I upload menu items and prices
-Then all my information will be displayed to customers. 
 
 
-US-7 - Respond to reviews
 
-Scenario: Responding to customer reviews
-Given a customer gives a review about my service/products.
-When they post it to the review page
-Then I am able to reply to the review. 
 
-US-8 - View customers orders and who needs to pay
 
-Scenario: Viewing customer orders and who needs to pay. 
-Given customers have placed an order. 
-When I view the full list of orders
-Then I can view who still needs to pay. 
+US-6 - 
+
+
+
+
+
+
+
+US-7 - 
+
+
+
+
+
+
+US-8 - 
+
+
+
+
+
 
 3. Non-Functional Requirements
 
@@ -121,14 +121,11 @@ M1 Requirements — this file and related stories opened as issues.
 M2 High-fidelity prototype — core customer and provider UI flows are fully interactive. 
 M3 Design — architecture, schema, and API outline. 
 M4 Backend API — key endpoints and tests. 
-M5 Increment — at least 2 use cases end-to-end.
-
+M5 Increment — at least 2 use cases end-to-end. 
 M6 Final — complete system and documentation.
 
 
 6. Change Management
-Stories are living artifacts; changes are tracked via repository issues and linked pull requests.
-Major changes should update this SRS.
 
 
 

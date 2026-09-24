@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leave a Review | FitMatch</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="customer-dashboard.html" class="logo">Fit<span>Match</span></a>
+      <ul class="nav-links">
+        <li><a href="browse-cooks.html">Browse Cooks</a></li>
+        <li><a href="customer-dashboard.html">Dashboard</a></li>
+        <li class="pill">Hi, <span id="nav-user-name">Guest</span></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container">
+      <a href="customer-dashboard.html">&larr; Back to Dashboard</a>
+
+      <div id="review-page-content" class="card form-card" style="margin-top:16px;">
+        <!-- Filled in by JavaScript once we know which order this is for -->
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>FitMatch demo prototype - CSC 340 Milestone 2</p>
+  </footer>
+
+  <script src="../js/customer.js"></script>
+  <script>
+    const orderId = getQueryParam("order");
+    const orders = getOrders();
+    const order = orders.find(o => o.id === orderId);
+    const contentEl = document.getElementById("review-page-content");
+
+    // Only allow the review flow for a delivered order, per US-4
+    if (!order || order.status !== "Delivered") {
+      contentEl.innerHTML = "<p>This review can only be left for a delivered order. <a href='customer-dashboard.html'>Back to Dashboard</a></p>";
+    } else if (order.reviewed) {
+      contentEl.innerHTML = "<p>You've already reviewed this order. <a href='customer-dashboard.html'>Back to Dashboard</a></p>";
+    } else {
+      contentEl.innerHTML = `
+        <h2>Rate your meal</h2>
+        <p style="color:var(--color-text-muted);">${order.mealName} from ${order.cookName}</p>
+
+        <div class="form-group">
+          <label>Your rating</label>
+          <div class="star-picker" id="star-picker">
+            <span data-value="1">&#9733;</span>
+            <span data-value="2">&#9733;</span>
+            <span data-value="3">&#9733;</span>
+            <span data-value="4">&#9733;</span>
+            <span data-value="5">&#9733;</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="review-text">Your review</label>
+          <textarea id="review-text" placeholder="Tell other customers what you thought..."></textarea>
+        </div>
+
+        <p id="review-error" style="color:#b00020; display:none;">Please select a star rating before submitting.</p>
+
+        <button id="submit-review" class="btn btn-primary btn-block">Submit Review</button>
+      `;
+
+      // Star picker: clicking a star highlights it and every star before it
+      let selectedStars = 0;
+      const stars = document.querySelectorAll("#star-picker span");
+
+      stars.forEach(star => {
+        star.addEventListener("click", () => {
+          selectedStars = Number(star.dataset.value);
+          stars.forEach(s => {
+            s.classList.toggle("selected", Number(s.dataset.value) <= selectedStars);
+          });
+        });
+      });
+
+      document.getElementById("submit-review").addEventListener("click", () => {
+        const errorEl = document.getElementById("review-error");
+
+        if (selectedStars === 0) {
+          errorEl.style.display = "block";
+          return;
+        }
+
+        // Save the review
+        const reviews = getReviews();
+        reviews.push({
+          cookId: order.cookId,
+          meal: order.mealName,
+          stars: selectedStars,
+          text: document.getElementById("review-text").value || "(No written comments)",
+          reviewer: getUser() ? getUser().firstName : "Demo Customer"
+        });
+        saveReviews(reviews);
+
+        // Mark the order as reviewed so the button disappears from the dashboard
+        order.reviewed = true;
+        saveOrders(orders);
+
+        // Show a confirmation state instead of navigating away, then link onward
+        contentEl.innerHTML = `
+          <div class="confirm-icon">&#10003;</div>
+          <h2 style="text-align:center;">Thanks for your review!</h2>
+          <p style="text-align:center; color:var(--color-text-muted);">Your rating and review are now visible on ${order.cookName}'s profile.</p>
+          <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+            <a href="cook-profile.html?cook=${order.cookId}" class="btn btn-primary">See Your Review</a>
+            <a href="customer-dashboard.html" class="btn btn-outline">Back to Dashboard</a>
+          </div>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>

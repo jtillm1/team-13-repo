@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cook Profile | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="customer-dashboard.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="browse-cooks.html">Browse Cooks</a></li>
+        <li><a href="customer-dashboard.html">Dashboard</a></li>
+        <li><a href="customer-settings.html">Settings</a></li>
+        <li class="pill">Hi, <span id="nav-user-name">Guest</span></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container">
+      <a href="browse-cooks.html">&larr; Back to Browse Cooks</a>
+
+      <!-- Cook info, filled in by JavaScript based on ?cook= in the URL -->
+      <div class="card" style="margin-top: 16px; display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+        <div class="cook-photo" id="cook-photo" style="width:110px; height:110px; flex-shrink:0;"></div>
+        <div>
+          <h1 id="cook-name" style="margin-bottom:6px;"></h1>
+          <span class="rating" id="cook-rating"></span>
+          <div class="tag-row" id="cook-tags" style="margin-top:10px;"></div>
+          <p id="cook-bio" style="margin-top:12px;"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- US-3: order a meal, right here on the cook's page -->
+  <section class="page-section tight">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Order a meal</h2>
+        <p>Pick a meal, choose one-time or subscription, and confirm.</p>
+      </div>
+
+      <div class="card form-card">
+        <!-- Shown instead of the form when nobody is signed in -->
+        <div id="order-locked" style="display:none; text-align:center;">
+          <p>You need an account to place an order.</p>
+          <a href="customer-register.html" class="btn btn-primary">Sign Up to Order</a>
+        </div>
+
+        <form id="order-form">
+          <div class="form-group">
+            <label for="meal-select">Meal</label>
+            <select id="meal-select"></select>
+          </div>
+
+          <div class="form-group">
+            <label>Order type</label>
+            <div class="checkbox-row">
+              <label class="checkbox-pill">
+                <input type="radio" name="order-type" value="One-time order" checked /> One-time order
+              </label>
+              <label class="checkbox-pill">
+                <input type="radio" name="order-type" value="Weekly meal plan subscription" /> Weekly subscription
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" min="1" value="1" />
+          </div>
+
+          <div class="form-group">
+            <label for="delivery-date">Delivery date</label>
+            <input type="date" id="delivery-date" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Confirm Order</button>
+        </form>
+
+        <!-- Confirmation shows here after the form is submitted -->
+        <div id="order-confirmation" style="display:none; text-align:center; margin-top:20px;">
+          <div class="confirm-icon">&#10003;</div>
+          <h3>Order confirmed!</h3>
+          <p id="confirmation-text" style="color:var(--color-text-muted);"></p>
+          <a href="customer-dashboard.html" class="btn btn-primary">View on My Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section tight">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Customer reviews</h2>
+      </div>
+      <div class="card" id="review-list"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>FitMatch demo prototype - CSC 340 Milestone 2</p>
+  </footer>
+
+  <script src="../js/customer.js"></script>
+  <script>
+    const cookId = getQueryParam("cook") || "maria"; // fall back to a default cook
+    const cook = findCook(cookId);
+
+    if (cook) {
+      document.getElementById("cook-photo").innerHTML = `<img src="../images/${cook.image}" alt="${cook.name}">`;
+      document.getElementById("cook-name").textContent = cook.name;
+      document.getElementById("cook-rating").innerHTML = `&#9733; ${cook.rating}`;
+      document.getElementById("cook-bio").textContent = cook.bio;
+
+      const tagsEl = document.getElementById("cook-tags");
+      tagsEl.innerHTML = `<span class="tag">${cook.cuisine}</span>` +
+        cook.diet.map(d => `<span class="tag">${d}</span>`).join("");
+
+      // Fill the meal dropdown with this cook's meals
+      const mealSelect = document.getElementById("meal-select");
+      cook.meals.forEach(meal => {
+        const option = document.createElement("option");
+        option.value = meal.id;
+        option.textContent = `${meal.name} - $${meal.price}`;
+        mealSelect.appendChild(option);
+      });
+
+      // Guests can browse and view cooks, but need an account to order
+      if (!getUser()) {
+        document.getElementById("order-form").style.display = "none";
+        document.getElementById("order-locked").style.display = "block";
+      } else {
+        // Handle placing the order
+        document.getElementById("order-form").addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const meal = findMeal(cook.id, mealSelect.value);
+          const orderType = document.querySelector('input[name="order-type"]:checked').value;
+          const quantity = Number(document.getElementById("quantity").value);
+          const date = document.getElementById("delivery-date").value;
+
+          // Save the order to localStorage so it shows up on the dashboard
+          const orders = getOrders();
+          orders.push({
+            id: "order-" + Date.now(),
+            cookId: cook.id,
+            cookName: cook.name,
+            mealName: meal.name,
+            orderType: orderType,
+            quantity: quantity,
+            date: date,
+            total: meal.price * quantity,
+            status: "Active",
+            reviewed: false
+          });
+          saveOrders(orders);
+
+          // Show the confirmation message in place of the form
+          document.getElementById("order-form").style.display = "none";
+          document.getElementById("order-confirmation").style.display = "block";
+          document.getElementById("confirmation-text").textContent =
+            `${meal.name} (${orderType}) is confirmed for ${date}.`;
+        });
+      }
+
+      // Show reviews for this specific cook
+      const reviews = getReviews().filter(r => r.cookId === cook.id);
+      const reviewListEl = document.getElementById("review-list");
+
+      if (reviews.length === 0) {
+        reviewListEl.innerHTML = "<p>No reviews yet for this cook.</p>";
+      } else {
+        reviews.forEach(r => {
+          const div = document.createElement("div");
+          div.className = "review";
+          const stars = "&#9733;".repeat(r.stars) + "&#9734;".repeat(5 - r.stars);
+          div.innerHTML = `
+            <div class="review-stars">${stars}</div>
+            <p style="margin: 4px 0;">${r.text}</p>
+            <span style="font-size:0.85rem; color:var(--color-text-muted);">${r.reviewer} &middot; ${r.meal}</span>
+          `;
+          reviewListEl.appendChild(div);
+        });
+      }
+    } else {
+      document.querySelector(".container").innerHTML = "<p>Cook not found. <a href='browse-cooks.html'>Back to Browse Cooks</a></p>";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Cooks | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="customer-dashboard.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="browse-cooks.html">Browse Cooks</a></li>
+        <li><a href="customer-dashboard.html">Dashboard</a></li>
+        <li><a href="customer-settings.html">Settings</a></li>
+        <li class="pill">Hi, <span id="nav-user-name">Guest</span></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container">
+      <div class="section-heading">
+        <h1>Find a cook</h1>
+        <p>Search by name, or filter by cuisine and dietary preference to find your match.</p>
+      </div>
+
+      <!-- US-2: Filter bar. Filtering runs entirely in JavaScript,
+           there's no backend involved. -->
+      <div class="filter-bar">
+        <div class="form-group">
+          <label for="search-input">Search</label>
+          <input type="text" id="search-input" placeholder="Search cooks..." />
+        </div>
+
+        <div class="form-group">
+          <label for="cuisine-filter">Cuisine</label>
+          <select id="cuisine-filter">
+            <option value="">All cuisines</option>
+            <option value="Italian">Italian</option>
+            <option value="Mexican">Mexican</option>
+            <option value="American">American</option>
+            <option value="Asian">Asian</option>
+            <option value="Mediterranean">Mediterranean</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="diet-filter">Dietary preference</label>
+          <select id="diet-filter">
+            <option value="">All diets</option>
+            <option value="Vegetarian">Vegetarian</option>
+            <option value="Vegan">Vegan</option>
+            <option value="Gluten-Free">Gluten-Free</option>
+            <option value="Dairy-Free">Dairy-Free</option>
+            <option value="High-Protein">High-Protein</option>
+          </select>
+        </div>
+
+        <button id="clear-filters" class="btn btn-outline btn-small">Clear filters</button>
+      </div>
+
+      <div class="grid grid-3" id="cook-grid">
+        <!-- Cook cards are inserted here by JavaScript -->
+      </div>
+
+      <p id="no-results" style="display:none; color: var(--color-text-muted);">
+        No cooks match those filters. Try clearing a filter.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype - CSC 340 Milestone 2</p>
+  </footer>
+
+  <script src="../js/customer.js"></script>
+  <script>
+    const cookGrid = document.getElementById("cook-grid");
+    const searchInput = document.getElementById("search-input");
+    const cuisineFilter = document.getElementById("cuisine-filter");
+    const dietFilter = document.getElementById("diet-filter");
+    const noResults = document.getElementById("no-results");
+
+    // Draws the cook cards for whichever list is passed in
+    function renderCooks(list) {
+      cookGrid.innerHTML = "";
+      noResults.style.display = list.length === 0 ? "block" : "none";
+
+      list.forEach(cook => {
+        const card = document.createElement("div");
+        card.className = "card cook-card";
+
+        const dietTags = cook.diet.map(d => `<span class="tag">${d}</span>`).join("");
+
+        card.innerHTML = `
+          <div class="cook-photo"><img src="../images/${cook.image}" alt="${cook.name}"></div>
+          <h3 style="margin-bottom:0;">${cook.name}</h3>
+          <span class="rating">&#9733; ${cook.rating}</span>
+          <div class="tag-row">
+            <span class="tag">${cook.cuisine}</span>
+            ${dietTags}
+          </div>
+          <p style="font-size:0.9rem; color:var(--color-text-muted);">${cook.bio}</p>
+          <a class="btn btn-primary btn-small" href="cook-profile.html?cook=${cook.id}">View Profile</a>
+        `;
+        cookGrid.appendChild(card);
+      });
+    }
+
+    // Reads the current filter values and re-renders the grid
+    function applyFilters() {
+      const search = searchInput.value.toLowerCase().trim();
+      const cuisine = cuisineFilter.value;
+      const diet = dietFilter.value;
+
+      const filtered = COOKS.filter(cook => {
+        const matchesSearch = cook.name.toLowerCase().includes(search);
+        const matchesCuisine = cuisine === "" || cook.cuisine === cuisine;
+        const matchesDiet = diet === "" || cook.diet.includes(diet);
+        return matchesSearch && matchesCuisine && matchesDiet;
+      });
+
+      renderCooks(filtered);
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    cuisineFilter.addEventListener("change", applyFilters);
+    dietFilter.addEventListener("change", applyFilters);
+
+    document.getElementById("clear-filters").addEventListener("click", () => {
+      searchInput.value = "";
+      cuisineFilter.value = "";
+      dietFilter.value = "";
+      applyFilters();
+    });
+
+    // Show every cook on first load
+    renderCooks(COOKS);
+  </script>
+</body>
+</html>

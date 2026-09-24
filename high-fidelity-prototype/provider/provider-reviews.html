@@ -17,7 +17,7 @@
         <li><a href="provider-menu.html">Menu</a></li>
         <li><a href="provider-reviews.html">Reviews</a></li>
         <li><a href="provider-orders.html">Orders</a></li>
-        <li><a href="../index.html" class="pill">Log out</a></li>
+        <li><a href="#" id="logout-link" class="pill">Log out</a></li>
       </ul>
     </div>
   </nav>
@@ -32,7 +32,40 @@
   <section class="page-section tight">
     <div class="container">
       <div class="card">
-        <div id="reviews-list"></div>
+        <!-- Static placeholder content for demo purposes. If provider.js
+             runs successfully, renderReviews() below will replace this
+             with the same data pulled from localStorage. -->
+        <div id="reviews-list">
+          <div class="review">
+            <div class="order-item" style="border-bottom:none; padding-bottom:0;">
+              <strong>Alexis P.</strong>
+              <span class="review-stars">★★★★★</span>
+            </div>
+            <p style="margin:6px 0;">The Mediterranean bowls were incredible and arrived right on time!</p>
+            <p style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom:10px;">2026-09-10</p>
+            <div class="reply-box">
+              <form onsubmit="return false;">
+                <div class="form-group" style="margin-bottom:10px;">
+                  <textarea placeholder="Write a reply..." style="min-height:60px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-small">Post reply</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="review">
+            <div class="order-item" style="border-bottom:none; padding-bottom:0;">
+              <strong>Marcus T.</strong>
+              <span class="review-stars">★★★★☆</span>
+            </div>
+            <p style="margin:6px 0;">Really tasty, wish there were more vegetarian options.</p>
+            <p style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom:10px;">2026-09-15</p>
+            <div class="reply-box">
+              <span class="reply-label">Your reply · 2026-09-16</span>
+              <p>Thanks so much, Marcus! Adding two new vegetarian bowls next week.</p>
+            </div>
+          </div>
+        </div>
         <p id="empty-reviews-message" style="color: var(--color-text-muted); display:none;">No reviews yet.</p>
       </div>
     </div>
@@ -108,7 +141,7 @@
     document.getElementById("logout-link").addEventListener("click", function (e) {
       e.preventDefault();
       logoutProvider();
-      window.location.href = "login.html";
+      window.location.href = "provider-login.html";
     });
 
     renderReviews();

@@ -17,7 +17,7 @@
         <li><a href="provider-menu.html">Menu</a></li>
         <li><a href="provider-reviews.html">Reviews</a></li>
         <li><a href="provider-orders.html">Orders</a></li>
-        <li><a href="../index.html" class="pill">Log out</a></li>
+        <li><a href="#" id="logout-link" class="pill">Log out</a></li>
       </ul>
     </div>
   </nav>
@@ -32,23 +32,49 @@
   <section class="page-section tight">
     <div class="container">
 
+      <!-- Static placeholder stats for demo purposes. If provider.js runs
+           successfully, renderOrders() below will replace these with the
+           same numbers computed from localStorage. -->
       <div class="grid grid-3" style="margin-bottom: 28px;">
         <div class="card">
-          <p class="stat-number" id="stat-total">0</p>
+          <p class="stat-number" id="stat-total">2</p>
           <p class="stat-label">Total orders</p>
         </div>
         <div class="card">
-          <p class="stat-number" id="stat-unpaid">0</p>
+          <p class="stat-number" id="stat-unpaid">1</p>
           <p class="stat-label">Still need to pay</p>
         </div>
         <div class="card">
-          <p class="stat-number" id="stat-revenue">$0.00</p>
+          <p class="stat-number" id="stat-revenue">$25.00</p>
           <p class="stat-label">Collected revenue</p>
         </div>
       </div>
 
       <div class="card">
-        <div id="orders-list"></div>
+        <!-- Static placeholder orders for demo purposes. -->
+        <div id="orders-list">
+          <div class="order-item">
+            <div>
+              <strong>Alexis P.</strong>
+              <p style="margin:4px 0 0 0; font-size:0.9rem; color:var(--color-text-muted);">2x Mediterranean Bowl · 2026-09-18</p>
+            </div>
+            <div style="text-align:right;">
+              <p style="margin:0 0 6px 0; font-weight:700;">$25.00</p>
+              <span class="status-badge status-delivered">Paid</span>
+            </div>
+          </div>
+
+          <div class="order-item">
+            <div>
+              <strong>Marcus T.</strong>
+              <p style="margin:4px 0 0 0; font-size:0.9rem; color:var(--color-text-muted);">1x Weekly Family Pack · 2026-09-20</p>
+            </div>
+            <div style="text-align:right;">
+              <p style="margin:0 0 6px 0; font-weight:700;">$48.00</p>
+              <span class="status-badge status-active">Unpaid</span>
+            </div>
+          </div>
+        </div>
         <p id="empty-orders-message" style="color: var(--color-text-muted); display:none;">No orders yet.</p>
       </div>
 
@@ -104,7 +130,7 @@
     document.getElementById("logout-link").addEventListener("click", function (e) {
       e.preventDefault();
       logoutProvider();
-      window.location.href = "login.html";
+      window.location.href = "provider-login.html";
     });
 
     renderOrders();

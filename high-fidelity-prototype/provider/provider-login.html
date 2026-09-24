@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Log In | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="../index.html" class="logo">Meal<span>Share</span></a>
+    </div>
+  </nav>
+
+  <section class="hero page-section tight">
+    <div class="container">
+      <h1>Welcome back</h1>
+      <p>Log in to manage your catering profile, menu, reviews, and orders.</p>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="container">
+      <div class="card form-card">
+        <form id="provider-login-form">
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" required placeholder="jordan@email.com" />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" required placeholder="••••••••" />
+          </div>
+
+          <p id="error-message" style="color:#b00020; display:none;"></p>
+
+          <button type="submit" class="btn btn-primary btn-block">Log in</button>
+        </form>
+
+        <p class="form-footer-text">New to MealShare? <a href="register.html">Create a provider account</a></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype</p>
+  </footer>
+
+  <script src="../js/provider.js"></script>
+  <script>
+    document.getElementById("provider-login-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorEl = document.getElementById("error-message");
+
+      const provider = findProviderByEmail(email);
+
+      if (!provider || provider.password !== password) {
+        errorEl.textContent = "We couldn't find an account with that email and password.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      setCurrentProvider(provider.id);
+      window.location.href = "dashboard.html";
+    });
+  </script>
+</body>
+</html>

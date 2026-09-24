@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up | MealShare</title>
+  <title>Provider Sign Up | MealShare</title>
   <link rel="stylesheet" href="../css/style.css" />
 </head>
 <body>
@@ -16,10 +15,10 @@
     </div>
   </nav>
 
-  <section class="hero pag  e-section tight">
+  <section class="hero page-section tight">
     <div class="container">
       <h1>Create your account</h1>
-      <p>Tell us a bit about your cooking preferences, to help us display your profile to the right customers.</p>
+      <p>Set up your provider account so we can get your catering profile in front of customers.</p>
     </div>
   </section>
 
@@ -27,8 +26,10 @@
     <div class="container">
       <div class="card form-card">
 
-        <!-- US-1: Registration form. No backend, so we just save this
-             to localStorage and pretend the account was created. -->
+        <!-- US-5: Registration form (account creation step). No backend,
+             so we just save this to localStorage and pretend the account
+             was created. The full catering profile (description, cuisine,
+             pricing, etc.) is filled in right after on profile.html. -->
         <form id="register-form">
 
           <div class="form-group">
@@ -66,6 +67,8 @@
           <button type="submit" class="btn btn-primary btn-block">Create account</button>
         </form>
 
+        <p class="form-footer-text">Already have an account? <a href="provider-login.html">Log in</a></p>
+
       </div>
     </div>
   </section>
@@ -74,10 +77,10 @@
     <p>MealShare demo prototype - CSC 340 Milestone 2</p>
   </footer>
 
-  <script src="../js/customer.js"></script>
+  <script src="../js/provider.js"></script>
   <script>
     // Handle the sign-up form. There's no backend, so we just
-    // check the passwords match and save the user to localStorage.
+    // check the passwords match and save the provider to localStorage.
     document.getElementById("register-form").addEventListener("submit", function (e) {
       e.preventDefault();
 
@@ -91,22 +94,25 @@
         return;
       }
 
-      const dietChecks = document.querySelectorAll('input[name="diet"]:checked');
-      const cuisineChecks = document.querySelectorAll('input[name="cuisine"]:checked');
+      if (findProviderByEmail(document.getElementById("email").value)) {
+        errorEl.textContent = "An account with that email already exists. Try logging in instead.";
+        errorEl.style.display = "block";
+        return;
+      }
 
-      const user = {
+      const provider = {
         firstName: document.getElementById("first-name").value,
         lastName: document.getElementById("last-name").value,
+        businessName: document.getElementById("business-name").value,
         email: document.getElementById("email").value,
-        diet: Array.from(dietChecks).map(c => c.value),
-        cuisine: Array.from(cuisineChecks).map(c => c.value)
+        password: password
       };
 
       // Simulate account creation - just store it locally
-      saveUser(user);
+      registerProvider(provider);
 
-      // Go straight to the dashboard, as if the customer just logged in
-      window.location.href = "provider-dashboard.html";
+      // Straight into building out the catering profile (US-5).
+      window.location.href = "provider-profile.html";
     });
   </script>
 </body>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catering Profile | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <!-- Nav bar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="../index.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="provider-dashboard.html">Dashboard</a></li>
+        <li><a href="provider-profile.html">Profile</a></li>
+        <li><a href="provider-menu.html">Menu</a></li>
+        <li><a href="provider-reviews.html">Reviews</a></li>
+        <li><a href="provider-orders.html">Orders</a></li>
+        <li><a href="#" id="logout-link" class="pill">Log out</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container section-heading">
+      <h1>Catering profile</h1>
+      <p>This is what customers see when they browse cooks. Fill it out and save - you can come back and update it any time.</p>
+    </div>
+  </section>
+
+  <section class="page-section tight">
+    <div class="container grid grid-2">
+
+      <!-- US-5: profile form -->
+      <div class="card">
+        <form id="profile-form">
+
+          <div class="form-group">
+            <label for="business-name">Business / cook name</label>
+            <input type="text" id="business-name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="description">About / description</label>
+            <textarea id="description" placeholder="Tell customers what makes your cooking special..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="location">Location / delivery area</label>
+            <input type="text" id="location" placeholder="Charlotte, NC" />
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Contact phone</label>
+            <input type="text" id="phone" placeholder="(704) 555-0136" />
+          </div>
+
+          <div class="form-group">
+            <label for="price-range">Typical price range</label>
+            <select id="price-range">
+              <option value="$">$ - Budget friendly</option>
+              <option value="$$">$$ - Moderate</option>
+              <option value="$$$">$$$ - Premium</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Cuisine tags</label>
+            <div class="checkbox-row">
+              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="Italian" /> Italian</label>
+              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="Mexican" /> Mexican</label>
+              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="American" /> American</label>
+              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="Asian" /> Asian</label>
+              <label class="checkbox-pill"><input type="checkbox" name="cuisine" value="Mediterranean" /> Mediterranean</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Dietary options offered</label>
+            <div class="checkbox-row">
+              <label class="checkbox-pill"><input type="checkbox" name="diet" value="Vegetarian" /> Vegetarian</label>
+              <label class="checkbox-pill"><input type="checkbox" name="diet" value="Vegan" /> Vegan</label>
+              <label class="checkbox-pill"><input type="checkbox" name="diet" value="Gluten-Free" /> Gluten-Free</label>
+              <label class="checkbox-pill"><input type="checkbox" name="diet" value="Dairy-Free" /> Dairy-Free</label>
+              <label class="checkbox-pill"><input type="checkbox" name="diet" value="High-Protein" /> High-Protein</label>
+            </div>
+          </div>
+
+          <p id="saved-message" style="color: var(--color-success-text); display:none;">Profile saved! Customers can now see this.</p>
+
+          <button type="submit" class="btn btn-primary btn-block">Save profile</button>
+        </form>
+      </div>
+
+      <!-- Live preview of the cook-card customers browse -->
+      <div>
+        <p style="font-weight:600; margin-bottom:10px;">Preview - how customers will see you</p>
+        <div class="card cook-card">
+          <div class="cook-photo" id="preview-initial">?</div>
+          <h3 id="preview-name">Your business name</h3>
+          <p id="preview-description" style="color: var(--color-text-muted);">Your description will appear here.</p>
+          <p id="preview-location" style="font-size:0.85rem; color: var(--color-text-muted);"></p>
+          <div class="tag-row" id="preview-cuisine"></div>
+          <div class="tag-row" id="preview-diet"></div>
+          <p><span class="rating">★ New</span></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype</p>
+  </footer>
+
+  <script src="../js/provider.js"></script>
+  <script>
+    const provider = requireProviderAuth();
+
+    const nameInput = document.getElementById("business-name");
+    const descInput = document.getElementById("description");
+    const locationInput = document.getElementById("location");
+    const phoneInput = document.getElementById("phone");
+    const priceInput = document.getElementById("price-range");
+
+    // Pre-fill the form with whatever the provider already has saved.
+    if (provider) {
+      nameInput.value = provider.businessName || "";
+      descInput.value = provider.description || "";
+      locationInput.value = provider.location || "";
+      phoneInput.value = provider.phone || "";
+      if (provider.priceRange) priceInput.value = provider.priceRange;
+
+      (provider.cuisineTags || []).forEach(function (val) {
+        const box = document.querySelector('input[name="cuisine"][value="' + val + '"]');
+        if (box) box.checked = true;
+      });
+      (provider.dietaryTags || []).forEach(function (val) {
+        const box = document.querySelector('input[name="diet"][value="' + val + '"]');
+        if (box) box.checked = true;
+      });
+
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const name = nameInput.value || "Your business name";
+      document.getElementById("preview-name").textContent = name;
+      document.getElementById("preview-initial").textContent = name.charAt(0).toUpperCase() || "?";
+      document.getElementById("preview-description").textContent =
+        descInput.value || "Your description will appear here.";
+      document.getElementById("preview-location").textContent = locationInput.value;
+
+      const cuisineChecked = Array.from(document.querySelectorAll('input[name="cuisine"]:checked')).map(c => c.value);
+      const dietChecked = Array.from(document.querySelectorAll('input[name="diet"]:checked')).map(c => c.value);
+
+      document.getElementById("preview-cuisine").innerHTML =
+        cuisineChecked.map(c => '<span class="tag">' + c + '</span>').join("");
+      document.getElementById("preview-diet").innerHTML =
+        dietChecked.map(c => '<span class="tag">' + c + '</span>').join("");
+    }
+
+    document.getElementById("profile-form").addEventListener("input", updatePreview);
+
+    document.getElementById("profile-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const cuisineChecked = Array.from(document.querySelectorAll('input[name="cuisine"]:checked')).map(c => c.value);
+      const dietChecked = Array.from(document.querySelectorAll('input[name="diet"]:checked')).map(c => c.value);
+
+      // US-5: save the profile so it's ready to display to customers.
+      updateProvider(provider.id, {
+        businessName: nameInput.value,
+        description: descInput.value,
+        location: locationInput.value,
+        phone: phoneInput.value,
+        priceRange: priceInput.value,
+        cuisineTags: cuisineChecked,
+        dietaryTags: dietChecked
+      });
+
+      const savedMsg = document.getElementById("saved-message");
+      savedMsg.style.display = "block";
+      setTimeout(function () { savedMsg.style.display = "none"; }, 2500);
+    });
+
+    document.getElementById("logout-link").addEventListener("click", function (e) {
+      e.preventDefault();
+      logoutProvider();
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

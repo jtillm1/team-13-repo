@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu & Pricing | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="../index.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="provider-dashboard.html">Dashboard</a></li>
+        <li><a href="provider-profile.html">Profile</a></li>
+        <li><a href="provider-menu.html">Menu</a></li>
+        <li><a href="provider-reviews.html">Reviews</a></li>
+        <li><a href="provider-orders.html">Orders</a></li>
+        <li><a href="#" id="logout-link" class="pill">Log out</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container section-heading">
+      <h1>Menu & pricing</h1>
+      <p>Add the meals you offer and set a price for each. Everything here shows up on your public profile.</p>
+    </div>
+  </section>
+
+  <section class="page-section tight">
+    <div class="container">
+      <div class="card" style="margin-bottom: 28px;">
+        <h3>Add a menu item</h3>
+
+        <!-- US-6: add menu item + price -->
+        <form id="menu-form">
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label for="item-name">Item name</label>
+              <input type="text" id="item-name" required placeholder="Mediterranean Bowl" />
+            </div>
+            <div class="form-group">
+              <label for="item-price">Price ($)</label>
+              <input type="number" id="item-price" min="0" step="0.01" required placeholder="12.50" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="item-category">Category</label>
+            <select id="item-category">
+              <option value="Entree">Entree</option>
+              <option value="Side">Side</option>
+              <option value="Dessert">Dessert</option>
+              <option value="Family Pack">Family Pack</option>
+              <option value="Beverage">Beverage</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="item-description">Description</label>
+            <textarea id="item-description" placeholder="Grilled chicken, couscous, roasted vegetables, tzatziki..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Dietary tags</label>
+            <div class="checkbox-row">
+              <label class="checkbox-pill"><input type="checkbox" name="item-diet" value="Vegetarian" /> Vegetarian</label>
+              <label class="checkbox-pill"><input type="checkbox" name="item-diet" value="Vegan" /> Vegan</label>
+              <label class="checkbox-pill"><input type="checkbox" name="item-diet" value="Gluten-Free" /> Gluten-Free</label>
+              <label class="checkbox-pill"><input type="checkbox" name="item-diet" value="Dairy-Free" /> Dairy-Free</label>
+              <label class="checkbox-pill"><input type="checkbox" name="item-diet" value="High-Protein" /> High-Protein</label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-accent">Add to menu</button>
+        </form>
+      </div>
+
+      <h3>Your menu</h3>
+      <div id="menu-list"></div>
+      <p id="empty-menu-message" style="color: var(--color-text-muted); display:none;">You haven't added any menu items yet.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype</p>
+  </footer>
+
+  <script src="../js/provider.js"></script>
+  <script>
+    const provider = requireProviderAuth();
+
+    function renderMenu() {
+      const items = getMenuItems(provider.id);
+      const list = document.getElementById("menu-list");
+      const emptyMsg = document.getElementById("empty-menu-message");
+
+      if (items.length === 0) {
+        list.innerHTML = "";
+        emptyMsg.style.display = "block";
+        return;
+      }
+      emptyMsg.style.display = "none";
+
+      list.innerHTML = items.map(function (item) {
+        const tags = (item.dietaryTags || []).map(t => '<span class="tag">' + t + '</span>').join("");
+        return (
+          '<div class="card" style="margin-bottom:14px;">' +
+            '<div class="order-item" style="border-bottom:none; padding-bottom:0;">' +
+              '<div>' +
+                '<h4 style="margin-bottom:4px;">' + item.name + ' <span style="color:var(--color-accent); font-family:Inter, sans-serif; font-size:0.95rem;">$' + Number(item.price).toFixed(2) + '</span></h4>' +
+                '<p style="margin-bottom:6px; color:var(--color-text-muted); font-size:0.9rem;">' + (item.category || "") + (item.description ? " · " + item.description : "") + '</p>' +
+                '<div class="tag-row">' + tags + '</div>' +
+              '</div>' +
+              '<div>' +
+                '<button class="btn btn-outline btn-small" onclick="removeItem(\'' + item.id + '\')">Delete</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function removeItem(id) {
+      deleteMenuItem(id);
+      renderMenu();
+    }
+
+    document.getElementById("menu-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const dietChecked = Array.from(document.querySelectorAll('input[name="item-diet"]:checked')).map(c => c.value);
+
+      // US-6: save the new menu item + price.
+      addMenuItem({
+        providerId: provider.id,
+        name: document.getElementById("item-name").value,
+        price: parseFloat(document.getElementById("item-price").value),
+        category: document.getElementById("item-category").value,
+        description: document.getElementById("item-description").value,
+        dietaryTags: dietChecked
+      });
+
+      e.target.reset();
+      renderMenu();
+    });
+
+    document.getElementById("logout-link").addEventListener("click", function (e) {
+      e.preventDefault();
+      logoutProvider();
+      window.location.href = "login.html";
+    });
+
+    renderMenu();
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Dashboard | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="../index.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="provider-dashboard.html">Dashboard</a></li>
+        <li><a href="provider-profile.html">Profile</a></li>
+        <li><a href="provider-menu.html">Menu</a></li>
+        <li><a href="provider-reviews.html">Reviews</a></li>
+        <li><a href="provider-orders.html">Orders</a></li>
+        <li><a href="#" id="logout-link" class="pill">Log out</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container section-heading">
+      <h1 id="welcome-heading">Welcome back</h1>
+      <p>Here's a quick snapshot of your MealShare business.</p>
+    </div>
+  </section>
+
+  <section class="page-section tight">
+    <div class="container">
+
+      <!-- Profile completeness nudge -->
+      <div class="card" id="profile-nudge" style="margin-bottom:24px; display:none;">
+        <h3>Finish setting up your catering profile</h3>
+        <p>Customers can't find you yet - add your description, cuisine, and pricing to get listed.</p>
+        <a href="profile.html" class="btn btn-accent">Complete profile</a>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom: 28px;">
+        <div class="card">
+          <p class="stat-number" id="stat-menu-count">0</p>
+          <p class="stat-label">Menu items listed</p>
+        </div>
+        <div class="card">
+          <p class="stat-number" id="stat-review-count">0</p>
+          <p class="stat-label">Customer reviews</p>
+        </div>
+        <div class="card">
+          <p class="stat-number" id="stat-unpaid-count">0</p>
+          <p class="stat-label">Orders needing payment</p>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Catering profile</h3>
+          <p>Update your description, cuisine tags, and pricing so customers know what you offer.</p>
+          <a href="provider-profile.html" class="btn btn-outline">Edit profile</a>
+        </div>
+        <div class="card">
+          <h3>Menu & pricing</h3>
+          <p>Add new meals or update prices on the items you already offer.</p>
+          <a href="provider-menu.html" class="btn btn-outline">Manage menu</a>
+        </div>
+        <div class="card">
+          <h3>Reviews</h3>
+          <p>See what customers are saying and reply to their feedback.</p>
+          <a href="provider-reviews.html" class="btn btn-outline">View reviews</a>
+        </div>
+        <div class="card">
+          <h3>Orders</h3>
+          <p>Check incoming orders and see who still needs to pay.</p>
+          <a href="provider-orders.html" class="btn btn-outline">View orders</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype</p>
+  </footer>
+
+  <script src="../js/provider.js"></script>
+  <script>
+    const provider = requireProviderAuth();
+
+    if (provider) {
+      seedDemoDataIfNeeded(provider.id);
+
+      document.getElementById("welcome-heading").textContent =
+        "Welcome back, " + (provider.firstName || provider.businessName);
+
+      if (!provider.profileComplete) {
+        document.getElementById("profile-nudge").style.display = "block";
+      }
+
+      document.getElementById("stat-menu-count").textContent = getMenuItems(provider.id).length;
+      document.getElementById("stat-review-count").textContent = getReviews(provider.id).length;
+      document.getElementById("stat-unpaid-count").textContent =
+        getOrders(provider.id).filter(o => o.status !== "Paid").length;
+    }
+
+    document.getElementById("logout-link").addEventListener("click", function (e) {
+      e.preventDefault();
+      logoutProvider();
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

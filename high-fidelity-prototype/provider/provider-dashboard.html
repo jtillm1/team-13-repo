@@ -86,28 +86,37 @@
 
   <script src="../js/provider.js"></script>
   <script>
-    const provider = requireProviderAuth();
+    // The stat/profile setup below needs js/provider.js. Wrapped in a
+    // try/catch so, if that file isn't there yet, the logout button
+    // (set up after this block) still works on its own.
+    try {
+      const provider = requireProviderAuth();
 
-    if (provider) {
-      seedDemoDataIfNeeded(provider.id);
+      if (provider) {
+        seedDemoDataIfNeeded(provider.id);
 
-      document.getElementById("welcome-heading").textContent =
-        "Welcome back, " + (provider.firstName || provider.businessName);
+        document.getElementById("welcome-heading").textContent =
+          "Welcome back, " + (provider.firstName || provider.businessName);
 
-      if (!provider.profileComplete) {
-        document.getElementById("profile-nudge").style.display = "block";
+        if (!provider.profileComplete) {
+          document.getElementById("profile-nudge").style.display = "block";
+        }
+
+        document.getElementById("stat-menu-count").textContent = getMenuItems(provider.id).length;
+        document.getElementById("stat-review-count").textContent = getReviews(provider.id).length;
+        document.getElementById("stat-unpaid-count").textContent =
+          getOrders(provider.id).filter(o => o.status !== "Paid").length;
       }
-
-      document.getElementById("stat-menu-count").textContent = getMenuItems(provider.id).length;
-      document.getElementById("stat-review-count").textContent = getReviews(provider.id).length;
-      document.getElementById("stat-unpaid-count").textContent =
-        getOrders(provider.id).filter(o => o.status !== "Paid").length;
+    } catch (err) {
+      console.warn("provider.js not loaded yet - dashboard stats skipped.", err);
     }
 
+    // Logout doesn't depend on provider.js - it just clears the
+    // saved provider session directly and sends you to the homepage.
     document.getElementById("logout-link").addEventListener("click", function (e) {
       e.preventDefault();
-      logoutProvider();
-      window.location.href = "login.html";
+      localStorage.removeItem("mealshare_provider");
+      window.location.href = "../index.html";
     });
   </script>
 </body>

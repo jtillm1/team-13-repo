@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="customer-dashboard.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="browse-cooks.html">Browse Cooks</a></li>
+        <li><a href="customer-dashboard.html">Dashboard</a></li>
+        <li><a href="customer-settings.html">Settings</a></li>
+        <li class="pill">Hi, <span id="nav-user-name">Guest</span></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container">
+      <a href="customer-dashboard.html">&larr; Back to Dashboard</a>
+
+      <div class="section-heading" style="margin-top: 16px;">
+        <h1>Settings</h1>
+        <p>Update your info and preferences, or log out of MealShare.</p>
+      </div>
+
+      <div class="card form-card">
+        <form id="settings-form">
+          <div class="form-group">
+            <label for="settings-first-name">First name</label>
+            <input type="text" id="settings-first-name" />
+          </div>
+
+          <div class="form-group">
+            <label for="settings-last-name">Last name</label>
+            <input type="text" id="settings-last-name" />
+          </div>
+
+          <div class="form-group">
+            <label for="settings-email">Email</label>
+            <input type="email" id="settings-email" />
+          </div>
+
+          <div class="form-group">
+            <label>Dietary preferences</label>
+            <div class="checkbox-row">
+              <label class="checkbox-pill"><input type="checkbox" name="settings-diet" value="Vegetarian" /> Vegetarian</label>
+              <label class="checkbox-pill"><input type="checkbox" name="settings-diet" value="Vegan" /> Vegan</label>
+              <label class="checkbox-pill"><input type="checkbox" name="settings-diet" value="Gluten-Free" /> Gluten-Free</label>
+              <label class="checkbox-pill"><input type="checkbox" name="settings-diet" value="Dairy-Free" /> Dairy-Free</label>
+              <label class="checkbox-pill"><input type="checkbox" name="settings-diet" value="High-Protein" /> High-Protein</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Cuisine preferences</label>
+            <div class="checkbox-row">
+              <label class="checkbox-pill"><input type="checkbox" name="settings-cuisine" value="Italian" /> Italian</label>
+              <label class="checkbox-pill"><input type="checkbox" name="settings-cuisine" value="Mexican" /> Mexican</label>
+              <label class="checkbox-pill"><input type="checkbox" name="settings-cuisine" value="American" /> American</label>
+              <label class="checkbox-pill"><input type="checkbox" name="settings-cuisine" value="Asian" /> Asian</label>
+              <label class="checkbox-pill"><input type="checkbox" name="settings-cuisine" value="Mediterranean" /> Mediterranean</label>
+            </div>
+          </div>
+
+          <p id="settings-saved-msg" style="display:none; color: var(--color-success-text);">Your changes have been saved.</p>
+
+          <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+        </form>
+
+        <button id="logout-btn" class="btn btn-outline btn-block" style="margin-top: 12px;">Log Out</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype - CSC 340 Milestone 2</p>
+  </footer>
+
+  <script src="../js/customer.js"></script>
+  <script>
+    // Pre-fill the form with whatever is currently saved
+    const user = getUser();
+
+    if (user) {
+      document.getElementById("settings-first-name").value = user.firstName || "";
+      document.getElementById("settings-last-name").value = user.lastName || "";
+      document.getElementById("settings-email").value = user.email || "";
+
+      document.querySelectorAll('input[name="settings-diet"]').forEach(box => {
+        box.checked = (user.diet || []).includes(box.value);
+      });
+      document.querySelectorAll('input[name="settings-cuisine"]').forEach(box => {
+        box.checked = (user.cuisine || []).includes(box.value);
+      });
+    }
+
+    // Save changes back to localStorage
+    document.getElementById("settings-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const dietChecks = document.querySelectorAll('input[name="settings-diet"]:checked');
+      const cuisineChecks = document.querySelectorAll('input[name="settings-cuisine"]:checked');
+
+      const updatedUser = {
+        firstName: document.getElementById("settings-first-name").value,
+        lastName: document.getElementById("settings-last-name").value,
+        email: document.getElementById("settings-email").value,
+        diet: Array.from(dietChecks).map(c => c.value),
+        cuisine: Array.from(cuisineChecks).map(c => c.value)
+      };
+
+      saveUser(updatedUser);
+      updateNavGreeting();
+
+      const savedMsg = document.getElementById("settings-saved-msg");
+      savedMsg.style.display = "block";
+      setTimeout(() => { savedMsg.style.display = "none"; }, 2500);
+    });
+
+    // Log out clears the saved user and sends them back to the homepage
+    document.getElementById("logout-btn").addEventListener("click", function () {
+      localStorage.removeItem("mealshare_user");
+      window.location.href = "../index.html";
+    });
+  </script>
+</body>
+</html>

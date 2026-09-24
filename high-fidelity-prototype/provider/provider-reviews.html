@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reviews | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="../index.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="provider-dashboard.html">Dashboard</a></li>
+        <li><a href="provider-profile.html">Profile</a></li>
+        <li><a href="provider-menu.html">Menu</a></li>
+        <li><a href="provider-reviews.html">Reviews</a></li>
+        <li><a href="provider-orders.html">Orders</a></li>
+        <li><a href="#" id="logout-link" class="pill">Log out</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container section-heading">
+      <h1>Reviews</h1>
+      <p>See what customers are saying and reply directly - your response shows up right under their review.</p>
+    </div>
+  </section>
+
+  <section class="page-section tight">
+    <div class="container">
+      <div class="card">
+        <div id="reviews-list"></div>
+        <p id="empty-reviews-message" style="color: var(--color-text-muted); display:none;">No reviews yet.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype</p>
+  </footer>
+
+  <script src="../js/provider.js"></script>
+  <script>
+    const provider = requireProviderAuth();
+    if (provider) seedDemoDataIfNeeded(provider.id);
+
+    function stars(rating) {
+      return "★".repeat(rating) + "☆".repeat(5 - rating);
+    }
+
+    function renderReviews() {
+      const reviews = getReviews(provider.id);
+      const list = document.getElementById("reviews-list");
+      const emptyMsg = document.getElementById("empty-reviews-message");
+
+      if (reviews.length === 0) {
+        list.innerHTML = "";
+        emptyMsg.style.display = "block";
+        return;
+      }
+      emptyMsg.style.display = "none";
+
+      list.innerHTML = reviews.map(function (review) {
+        let replySection;
+        if (review.reply) {
+          replySection =
+            '<div class="reply-box">' +
+              '<span class="reply-label">Your reply · ' + review.replyDate + '</span>' +
+              '<p>' + review.reply + '</p>' +
+            '</div>';
+        } else {
+          replySection =
+            '<div class="reply-box">' +
+              '<form onsubmit="submitReply(event, \'' + review.id + '\')">' +
+                '<div class="form-group" style="margin-bottom:10px;">' +
+                  '<textarea placeholder="Write a reply..." required style="min-height:60px;"></textarea>' +
+                '</div>' +
+                '<button type="submit" class="btn btn-primary btn-small">Post reply</button>' +
+              '</form>' +
+            '</div>';
+        }
+
+        return (
+          '<div class="review">' +
+            '<div class="order-item" style="border-bottom:none; padding-bottom:0;">' +
+              '<strong>' + review.customerName + '</strong>' +
+              '<span class="review-stars">' + stars(review.rating) + '</span>' +
+            '</div>' +
+            '<p style="margin:6px 0;">' + review.comment + '</p>' +
+            '<p style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom:10px;">' + review.date + '</p>' +
+            replySection +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function submitReply(e, reviewId) {
+      e.preventDefault();
+      const textarea = e.target.querySelector("textarea");
+      // US-7: save the provider's reply to this review.
+      replyToReview(reviewId, textarea.value);
+      renderReviews();
+    }
+
+    document.getElementById("logout-link").addEventListener("click", function (e) {
+      e.preventDefault();
+      logoutProvider();
+      window.location.href = "login.html";
+    });
+
+    renderReviews();
+  </script>
+</body>
+</html>

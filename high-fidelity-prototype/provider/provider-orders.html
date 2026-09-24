@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orders | MealShare</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="../index.html" class="logo">Meal<span>Share</span></a>
+      <ul class="nav-links">
+        <li><a href="provider-dashboard.html">Dashboard</a></li>
+        <li><a href="provider-profile.html">Profile</a></li>
+        <li><a href="provider-menu.html">Menu</a></li>
+        <li><a href="provider-reviews.html">Reviews</a></li>
+        <li><a href="provider-orders.html">Orders</a></li>
+        <li><a href="#" id="logout-link" class="pill">Log out</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-section tight">
+    <div class="container section-heading">
+      <h1>Orders</h1>
+      <p>Every order placed with you, and whether the customer still owes payment.</p>
+    </div>
+  </section>
+
+  <section class="page-section tight">
+    <div class="container">
+
+      <div class="grid grid-3" style="margin-bottom: 28px;">
+        <div class="card">
+          <p class="stat-number" id="stat-total">0</p>
+          <p class="stat-label">Total orders</p>
+        </div>
+        <div class="card">
+          <p class="stat-number" id="stat-unpaid">0</p>
+          <p class="stat-label">Still need to pay</p>
+        </div>
+        <div class="card">
+          <p class="stat-number" id="stat-revenue">$0.00</p>
+          <p class="stat-label">Collected revenue</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="orders-list"></div>
+        <p id="empty-orders-message" style="color: var(--color-text-muted); display:none;">No orders yet.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>MealShare demo prototype</p>
+  </footer>
+
+  <script src="../js/provider.js"></script>
+  <script>
+    const provider = requireProviderAuth();
+    if (provider) seedDemoDataIfNeeded(provider.id);
+
+    function renderOrders() {
+      const orders = getOrders(provider.id);
+      const list = document.getElementById("orders-list");
+      const emptyMsg = document.getElementById("empty-orders-message");
+
+      document.getElementById("stat-total").textContent = orders.length;
+      const unpaid = orders.filter(o => o.status !== "Paid");
+      document.getElementById("stat-unpaid").textContent = unpaid.length;
+      const revenue = orders.filter(o => o.status === "Paid").reduce((sum, o) => sum + o.total, 0);
+      document.getElementById("stat-revenue").textContent = "$" + revenue.toFixed(2);
+
+      if (orders.length === 0) {
+        list.innerHTML = "";
+        emptyMsg.style.display = "block";
+        return;
+      }
+      emptyMsg.style.display = "none";
+
+      // US-8: list every order and flag who still needs to pay.
+      list.innerHTML = orders.map(function (order) {
+        const itemSummary = order.items.map(i => i.qty + "x " + i.name).join(", ");
+        const badgeClass = order.status === "Paid" ? "status-delivered" : "status-active";
+        return (
+          '<div class="order-item">' +
+            '<div>' +
+              '<strong>' + order.customerName + '</strong>' +
+              '<p style="margin:4px 0 0 0; font-size:0.9rem; color:var(--color-text-muted);">' + itemSummary + ' · ' + order.date + '</p>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<p style="margin:0 0 6px 0; font-weight:700;">$' + order.total.toFixed(2) + '</p>' +
+              '<span class="status-badge ' + badgeClass + '">' + order.status + '</span>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    document.getElementById("logout-link").addEventListener("click", function (e) {
+      e.preventDefault();
+      logoutProvider();
+      window.location.href = "login.html";
+    });
+
+    renderOrders();
+  </script>
+</body>
+</html>

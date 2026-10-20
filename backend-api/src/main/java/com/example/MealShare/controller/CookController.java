@@ -1,7 +1,7 @@
-package com.example.MealShare.provider.controller;
+package com.example.MealShare.controller;
 
-import com.example.MealShare.provider.entity.Cook;
-import com.example.MealShare.provider.service.CookService;
+import com.example.MealShare.entity.Cook;
+import com.example.MealShare.service.CookService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

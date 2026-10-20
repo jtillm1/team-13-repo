@@ -1,6 +1,6 @@
-package com.example.MealShare.provider.repository;
+package com.example.MealShare.repository;
 
-import com.example.MealShare.provider.entity.Cook;
+import com.example.MealShare.entity.Cook;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

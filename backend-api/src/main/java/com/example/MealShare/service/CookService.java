@@ -1,7 +1,7 @@
-package com.example.MealShare.provider.service;
+package com.example.MealShare.service;
 
-import com.example.MealShare.provider.entity.Cook;
-import com.example.MealShare.provider.repository.CookRepository;
+import com.example.MealShare.entity.Cook;
+import com.example.MealShare.repository.CookRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

@@ -14,4 +14,8 @@ public interface CookRepository extends JpaRepository<Cook, Long> {
     List<Cook> findByNameContainingIgnoreCase(String name);
 
     List<Cook> findByNameContainingIgnoreCaseAndCuisineIgnoreCase(String name, String cuisine);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByEmailAndCookIdNot(String email, long cookId);
 }

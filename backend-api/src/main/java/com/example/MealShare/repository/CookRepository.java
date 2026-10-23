@@ -1,17 +1,12 @@
 package com.example.MealShare.repository;
 
-import com.example.MealShare.entity.Cook;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.example.MealShare.entity.Cook;
 
-@Repository
 public interface CookRepository extends JpaRepository<Cook, Long> {
 
-    List<Cook> findByCuisineIgnoreCase(String cuisine);
+    boolean existsByEmail(String email);
 
-    List<Cook> findByNameContainingIgnoreCase(String name);
-
-    List<Cook> findByNameContainingIgnoreCaseAndCuisineIgnoreCase(String name, String cuisine);
+    boolean existsByEmailAndCookIdNot(String email, Long cookId);
 }

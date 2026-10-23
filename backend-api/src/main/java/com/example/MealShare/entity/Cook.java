@@ -2,6 +2,8 @@ package com.example.MealShare.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +14,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "cooks")
@@ -19,28 +22,30 @@ public class Cook {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long cookId;
+    private Long cookId;
 
-    @NotBlank(message = "name is required")
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @NotBlank(message = "description is required")
+    @NotBlank(message = "Description is required")
     @Column(length = 1000)
     private String description;
 
-    @Email(message = "email must be valid")
-    @NotBlank(message = "email is required")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "password is required")
+    // Password can be sent in, but is never returned in JSON.
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    // e.g. Italian, Mexican, American, Asian, Mediterranean
     private String cuisine;
 
-    @DecimalMin(value = "0.0", message = "rating must be between 0 and 5")
-    @DecimalMax(value = "5.0", message = "rating must be between 0 and 5")
+    @DecimalMin(value = "0.0", message = "Rating must be between 0 and 5")
+    @DecimalMax(value = "5.0", message = "Rating must be between 0 and 5")
     private Double rating;
 
     private LocalDate joinedDate;
@@ -48,11 +53,11 @@ public class Cook {
     public Cook() {
     }
 
-    public long getCookId() {
+    public Long getCookId() {
         return cookId;
     }
 
-    public void setCookId(long cookId) {
+    public void setCookId(Long cookId) {
         this.cookId = cookId;
     }
 
@@ -79,7 +84,6 @@ public class Cook {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
     public String getPassword() {
         return password;

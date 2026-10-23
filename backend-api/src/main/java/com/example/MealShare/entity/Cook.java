@@ -1,7 +1,12 @@
 package com.example.MealShare.entity;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
+=======
+import java.time.LocalDate;
+
+>>>>>>> a5d716e9b1406d0cce4b41990cdf2474a2d5e4a7
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,10 +20,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+=======
+>>>>>>> a5d716e9b1406d0cce4b41990cdf2474a2d5e4a7
 @Entity
 @Table(name = "cooks")
 public class Cook {
@@ -34,6 +42,7 @@ public class Cook {
     @Column(length = 1000)
     private String description;
 
+<<<<<<< HEAD
     @NotBlank(message = "email is required")
     @Email(message = "email must be valid")
     @Column(unique = true)
@@ -43,6 +52,14 @@ public class Cook {
     @NotBlank(message = "password is required")
     @Size(min = 8, message = "password must be at least 8 characters")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+=======
+    @Email(message = "email must be valid")
+    @NotBlank(message = "email is required")
+    @Column(unique = true)
+    private String email;
+
+    @NotBlank(message = "password is required")
+>>>>>>> a5d716e9b1406d0cce4b41990cdf2474a2d5e4a7
     private String password;
 
     // e.g. Italian, Mexican, American, Asian, Mediterranean
@@ -63,15 +80,19 @@ public class Cook {
     public Cook() {
     }
 
-    public long getCookId() { return cookId; }
-    public void setCookId(long cookId) { this.cookId = cookId; }
+    public long getCookId() {
+        return cookId;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setCookId(long cookId) {
+        this.cookId = cookId;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getName() {
+        return name;
+    }
 
+<<<<<<< HEAD
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
@@ -80,13 +101,66 @@ public class Cook {
 
     public String getCuisine() { return cuisine; }
     public void setCuisine(String cuisine) { this.cuisine = cuisine; }
+=======
+    public void setName(String name) {
+        this.name = name;
+    }
+>>>>>>> a5d716e9b1406d0cce4b41990cdf2474a2d5e4a7
 
-    public Double getRating() { return rating; }
-    public void setRating(Double rating) { this.rating = rating; }
+    public String getDescription() {
+        return description;
+    }
 
+<<<<<<< HEAD
     public LocalDate getJoinedDate() { return joinedDate; }
     public void setJoinedDate(LocalDate joinedDate) { this.joinedDate = joinedDate; }
 
     public List<Meal> getMeals() { return meals; }
     public void setMeals(List<Meal> meals) { this.meals = meals; }
+=======
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getCuisine() {
+        return cuisine;
+    }
+
+    public void setCuisine(String cuisine) {
+        this.cuisine = cuisine;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public LocalDate getJoinedDate() {
+        return joinedDate;
+    }
+
+    public void setJoinedDate(LocalDate joinedDate) {
+        this.joinedDate = joinedDate;
+    }
+>>>>>>> a5d716e9b1406d0cce4b41990cdf2474a2d5e4a7
 }

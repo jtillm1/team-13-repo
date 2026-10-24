@@ -1,12 +1,13 @@
 package com.example.MealShare.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.MealShare.entity.Cook;
+import com.example.MealShare.entity.CookEntity;
 import com.example.MealShare.repository.CookRepository;
 
 @Service
@@ -18,55 +19,55 @@ public class CookService {
         this.cookRepository = cookRepository;
     }
 
-    // Register a new cook
-    public Cook create(Cook cook) {
-        if (cookRepository.existsByEmail(cook.getEmail())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Email is already registered");
-        }
-
-        cook.setCookId(null);
-        return cookRepository.save(cook);
-    }
-
-    // Get all cooks
-    public List<Cook> getAll() {
+    public List<CookEntity> getAllCooks() {
         return cookRepository.findAll();
     }
 
-    // Get one cook by ID
-    public Cook getById(Long id) {
-        return cookRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Cook not found"));
+    public List<CookEntity> getCooksByCuisine(String cuisine) {
+        return cookRepository.findByCuisineIgnoreCase(cuisine);
     }
 
-    // Update an existing cook
-    public Cook update(Long id, Cook updated) {
-        Cook existing = getById(id);
+    public CookEntity getCookById(Long id) {
+        return cookRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Cook not found with id " + id));
+    }
 
-        if (cookRepository.existsByEmailAndCookIdNot(
-                updated.getEmail(), id)) {
+    public CookEntity createCook(CookEntity cook) {
+        if (cookRepository.existsByEmail(cook.getEmail())) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Email is already registered");
+                    HttpStatus.CONFLICT, "A cook with that email already exists");
         }
+        cook.setId(null); // make sure this is always an insert
+        if (cook.getJoinedDate() == null) {
+            cook.setJoinedDate(LocalDate.now());
+        }
+        // TODO: hash cook.getPassword() (e.g. BCrypt via Spring Security) before saving
+        return cookRepository.save(cook);
+    }
+
+    public CookEntity updateCook(Long id, CookEntity updated) {
+        CookEntity existing = getCookById(id);
 
         existing.setName(updated.getName());
         existing.setDescription(updated.getDescription());
         existing.setEmail(updated.getEmail());
-        existing.setPassword(updated.getPassword());
         existing.setCuisine(updated.getCuisine());
         existing.setRating(updated.getRating());
         existing.setJoinedDate(updated.getJoinedDate());
 
+        // only change the password if a new one was sent
+        if (updated.getPassword() != null && !updated.getPassword().isBlank()) {
+            existing.setPassword(updated.getPassword()); // TODO: hash this too
+        }
         return cookRepository.save(existing);
     }
 
-    // Delete an existing cook
-    public void delete(Long id) {
-        Cook existing = getById(id);
-        cookRepository.delete(existing);
+    public void deleteCook(Long id) {
+        if (!cookRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Cook not found with id " + id);
+        }
+        cookRepository.deleteById(id);
     }
 }

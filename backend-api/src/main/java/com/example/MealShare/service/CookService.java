@@ -14,9 +14,11 @@ import com.example.MealShare.repository.CookRepository;
 public class CookService {
 
     private final CookRepository cookRepository;
+    private final MealRepository mealRepository;
 
-    public CookService(CookRepository cookRepository) {
+    public CookService(CookRepository cookRepository, MealRepository mealRepository) {
         this.cookRepository = cookRepository;
+        this.mealRepository = mealRepository;
     }
 
     public List<CookEntity> getAllCooks() {
@@ -68,6 +70,34 @@ public class CookService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Cook not found with id " + id);
         }
-        cookRepository.deleteById(id);
+        return meals;
+    }
+
+    public Meal getMeal(long cookId, long mealId) {
+        getCookById(cookId);
+        return mealRepository.findByMealIdAndCook_CookId(mealId, cookId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Meal " + mealId + " not found for cook " + cookId));
+    }
+
+    public Meal createMeal(long cookId, Meal meal) {
+        Cook cook = getCookById(cookId);
+        meal.setMealId(0); // force an INSERT
+        meal.setCook(cook);
+        return mealRepository.save(meal);
+    }
+
+    public Meal updateMeal(long cookId, long mealId, Meal updated) {
+        Meal existing = getMeal(cookId, mealId);
+        existing.setName(updated.getName());
+        existing.setDescription(updated.getDescription());
+        existing.setCategory(updated.getCategory());
+        existing.setPrice(updated.getPrice());
+        existing.setDietaryTags(updated.getDietaryTags());
+        return mealRepository.save(existing);
+    }
+
+    public void deleteMeal(long cookId, long mealId) {
+        mealRepository.delete(getMeal(cookId, mealId));
     }
 }

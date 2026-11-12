@@ -1,12 +1,12 @@
 package com.example.MealShare.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.MealShare.entity.Cook;
+import com.example.MealShare.entity.CookEntity;
 
-public interface CookRepository extends JpaRepository<Cook, Long> {
-
+public interface CookRepository extends JpaRepository<CookEntity, Long> {
     boolean existsByEmail(String email);
-
-    boolean existsByEmailAndCookIdNot(String email, Long cookId);
+    List<CookEntity> findByCuisineIgnoreCase(String cuisine);
 }

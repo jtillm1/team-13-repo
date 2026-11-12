@@ -1,5 +1,6 @@
 package com.example.MealShare.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -12,70 +13,70 @@ import com.example.MealShare.repository.CookRepository;
 @Service
 public class CookService {
 
-
-    //search for cooks by name, cuisine, and diet
-    public List<CookEntity> search(String name, String cuisine, String diet) {
-    return getAll(cuisine, diet).stream()
-            .filter(c -> name == null || name.isBlank()
-                    || c.getBusinessName().toLowerCase().contains(name.toLowerCase().trim()))
-            .toList();
-}
-
     private final CookRepository cookRepository;
 
     public CookService(CookRepository cookRepository) {
         this.cookRepository = cookRepository;
     }
 
-    // Register a new cook
-    public CookEntity create(CookEntity cook) {
-        if (cookRepository.existsByEmail(cook.getEmail())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Email is already registered");
-        }
-
-        cook.setCookId(null);
-        return cookRepository.save(cook);
-    }
-
-    // Get all cooks
-    public List<CookEntity> getAll() {
+    public List<CookEntity> getAllCooks() {
         return cookRepository.findAll();
     }
 
-    // Get one cook by ID
-    public CookEntity getById(Long id) {
-        return cookRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Cook not found"));
+    // US-2: every filter is optional, blank means "no filter"
+    public List<CookEntity> search(String name, String cuisine, String diet) {
+        return cookRepository.findAll().stream()
+                .filter(c -> name == null || name.isBlank()
+                        || c.getName().toLowerCase().contains(name.toLowerCase().trim()))
+                .filter(c -> cuisine == null || cuisine.isBlank()
+                        || c.getCuisine().equalsIgnoreCase(cuisine))
+                .filter(c -> diet == null || diet.isBlank()
+                        || c.getDietaryOptions().stream().anyMatch(d -> d.equalsIgnoreCase(diet)))
+                .toList();
     }
 
-    // Update an existing cook
-    public CookEntity update(Long id, CookEntity updated) {
-        CookEntity existing = getById(id);
+    public CookEntity getCookById(Long id) {
+        return cookRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Cook not found with id " + id));
+    }
 
-        if (cookRepository.existsByEmailAndCookIdNot(
-                updated.getEmail(), id)) {
+    public CookEntity createCook(CookEntity cook) {
+        if (cookRepository.existsByEmail(cook.getEmail())) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Email is already registered");
+                    HttpStatus.CONFLICT, "A cook with that email already exists");
         }
+        cook.setId(null); // make sure this is always an insert
+        if (cook.getJoinedDate() == null) {
+            cook.setJoinedDate(LocalDate.now());
+        }
+        return cookRepository.save(cook);
+    }
+
+    public CookEntity updateCook(Long id, CookEntity updated) {
+        CookEntity existing = getCookById(id);
 
         existing.setName(updated.getName());
         existing.setDescription(updated.getDescription());
         existing.setEmail(updated.getEmail());
-        existing.setPassword(updated.getPassword());
         existing.setCuisine(updated.getCuisine());
+        existing.setDietaryOptions(updated.getDietaryOptions());
         existing.setRating(updated.getRating());
+        existing.setImageUrl(updated.getImageUrl());
         existing.setJoinedDate(updated.getJoinedDate());
 
+        // only change the password if a new one was sent
+        if (updated.getPassword() != null && !updated.getPassword().isBlank()) {
+            existing.setPassword(updated.getPassword());
+        }
         return cookRepository.save(existing);
     }
 
-    // Delete an existing cook
-    public void delete(Long id) {
-        CookEntity existing = getById(id);
-        cookRepository.delete(existing);
+    public void deleteCook(Long id) {
+        if (!cookRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Cook not found with id " + id);
+        }
+        cookRepository.deleteById(id);
     }
 }

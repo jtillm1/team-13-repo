@@ -1,11 +1,14 @@
 package com.example.MealShare.service;
 
-import com.example.MealShare.entity.CookEntity;
-import com.example.MealShare.repository.CookRepository;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import com.example.MealShare.entity.CookEntity;
+import com.example.MealShare.repository.CookRepository;
 
 @Component
 public class DemoDataSeeder implements CommandLineRunner {
@@ -19,7 +22,7 @@ public class DemoDataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (cookRepository.count() > 0) {
-            return;
+            return; // only seed an empty table
         }
         cookRepository.save(cook("Maria's Kitchen", "maria@mealshare.demo", "Italian",
                 List.of("Vegetarian", "Gluten-Free"),
@@ -36,16 +39,17 @@ public class DemoDataSeeder implements CommandLineRunner {
     }
 
     private CookEntity cook(String name, String email, String cuisine, List<String> diets,
-                            String bio, double rating, String imageUrl) {
+                            String description, double rating, String imageUrl) {
         CookEntity c = new CookEntity();
-        c.setBusinessName(name);
+        c.setName(name);
         c.setEmail(email);
         c.setPassword("demo1234");
         c.setCuisine(cuisine);
         c.setDietaryOptions(new ArrayList<>(diets));
-        c.setBio(bio);
+        c.setDescription(description);
         c.setRating(rating);
         c.setImageUrl(imageUrl);
+        c.setJoinedDate(LocalDate.now());
         return c;
     }
 }

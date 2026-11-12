@@ -1,3 +1,4 @@
+
 package com.example.MealShare.service;
 
 import java.util.List;
@@ -18,42 +19,61 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    // US-1: register
+    // register a customer
     public CustomerEntity create(CustomerEntity customer) {
         checkPassword(customer.getPassword());
+
         if (customerRepository.existsByEmail(customer.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "That email is already registered");
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "That email is already registered"
+            );
         }
+
         customer.setId(null);
         return customerRepository.save(customer);
     }
 
-    // US-1: log in
+    // log in a customer
     public CustomerEntity login(String email, String password) {
         return customerRepository.findByEmail(email)
-                .filter(c -> c.getPassword().equals(password))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+            .filter(c -> c.getPassword() != null
+                && c.getPassword().equals(password))
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid email or password"
+            ));
     }
 
+    // get all customers
     public List<CustomerEntity> getAll() {
         return customerRepository.findAll();
     }
 
+    // get one customer
     public CustomerEntity getById(Long id) {
         return customerRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Customer not found"
+            ));
     }
 
-    // settings: a blank password keeps the current one
+    // update customer settings
     public CustomerEntity update(Long id, CustomerEntity updated) {
         CustomerEntity existing = getById(id);
 
         if (!existing.getEmail().equals(updated.getEmail())
                 && customerRepository.existsByEmail(updated.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "That email is already registered");
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "That email is already registered"
+            );
         }
 
-        if (updated.getPassword() != null && !updated.getPassword().isBlank()) {
+        // only update password if a new one was entered
+        if (updated.getPassword() != null
+                && !updated.getPassword().isBlank()) {
             checkPassword(updated.getPassword());
             existing.setPassword(updated.getPassword());
         }
@@ -63,16 +83,22 @@ public class CustomerService {
         existing.setEmail(updated.getEmail());
         existing.setDietaryPreferences(updated.getDietaryPreferences());
         existing.setCuisinePreferences(updated.getCuisinePreferences());
+
         return customerRepository.save(existing);
     }
 
+    // delete customer
     public void delete(Long id) {
         customerRepository.delete(getById(id));
     }
 
+    // check password length
     private void checkPassword(String password) {
         if (password == null || password.length() < 6) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Password must be at least 6 characters"
+            );
         }
     }
 }

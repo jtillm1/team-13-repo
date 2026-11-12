@@ -1,3 +1,4 @@
+
 package com.example.MealShare.service;
 
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import com.example.MealShare.repository.CookRepository;
 public class CookService {
 
     private final CookRepository cookRepository;
-    
 
     public CookService(CookRepository cookRepository) {
         this.cookRepository = cookRepository;
@@ -25,32 +25,63 @@ public class CookService {
     }
 
     public List<CookEntity> getCooksByCuisine(String cuisine) {
-        return cookRepository.findByCuisineIgnoreCase(cuisine);
+        return cookRepository.findAll().stream()
+                .filter(c -> c.getCuisine() != null
+                        && c.getCuisine().equalsIgnoreCase(cuisine))
+                .toList();
+    }
+
+    public List<CookEntity> search(
+            String name,
+            String cuisine,
+            String diet) {
+
+        return cookRepository.findAll().stream()
+                .filter(c -> name == null || name.isBlank()
+                        || (c.getName() != null
+                        && c.getName().toLowerCase()
+                        .contains(name.toLowerCase().trim())))
+
+                .filter(c -> cuisine == null || cuisine.isBlank()
+                        || (c.getCuisine() != null
+                        && c.getCuisine().equalsIgnoreCase(cuisine)))
+
+                .filter(c -> diet == null || diet.isBlank()
+                        || (c.getDietaryOptions() != null
+                        && c.getDietaryOptions().stream()
+                        .anyMatch(d -> d.equalsIgnoreCase(diet))))
+
+                .toList();
     }
 
     public CookEntity getCookById(Long id) {
         return cookRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Cook not found with id " + id));
+                        HttpStatus.NOT_FOUND,
+                        "Cook not found with id " + id
+                ));
     }
 
     public CookEntity createCook(CookEntity cook) {
+
         if (cookRepository.existsByEmail(cook.getEmail())) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "A cook with that email already exists");
+                    HttpStatus.CONFLICT,
+                    "A cook with that email already exists"
+            );
         }
-        cook.setId(null); // make sure this is always an insert
+
+        cook.setId(null);
+
         if (cook.getJoinedDate() == null) {
             cook.setJoinedDate(LocalDate.now());
         }
-<<<<<<< HEAD
-=======
-        // TODO: hash cook.getPassword() (e.g. BCrypt via Spring Security) before saving
->>>>>>> 7b6afc1249d6b6e2fa5d537914a82e55db04b97f
+
         return cookRepository.save(cook);
     }
 
     public CookEntity updateCook(Long id, CookEntity updated) {
+
         CookEntity existing = getCookById(id);
 
         existing.setName(updated.getName());
@@ -60,27 +91,28 @@ public class CookService {
         existing.setDietaryOptions(updated.getDietaryOptions());
         existing.setRating(updated.getRating());
         existing.setImageUrl(updated.getImageUrl());
-        existing.setJoinedDate(updated.getJoinedDate());
 
-        // only change the password if a new one was sent
-        if (updated.getPassword() != null && !updated.getPassword().isBlank()) {
-            existing.setPassword(updated.getPassword()); // TODO: hash this too
+        if (updated.getJoinedDate() != null) {
+            existing.setJoinedDate(updated.getJoinedDate());
         }
+
+        if (updated.getPassword() != null
+                && !updated.getPassword().isBlank()) {
+            existing.setPassword(updated.getPassword());
+        }
+
         return cookRepository.save(existing);
     }
 
     public void deleteCook(Long id) {
+
         if (!cookRepository.existsById(id)) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Cook not found with id " + id);
+                    HttpStatus.NOT_FOUND,
+                    "Cook not found with id " + id
+            );
         }
+
         cookRepository.deleteById(id);
     }
-
-    
-    
-
-    
-
-    
 }

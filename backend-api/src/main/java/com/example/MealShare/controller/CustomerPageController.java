@@ -1,6 +1,15 @@
 
 package com.example.MealShare.controller;
 
+import com.example.MealShare.entity.CookEntity;
+import com.example.MealShare.entity.CustomerEntity;
+import com.example.MealShare.service.CookService;
+import com.example.MealShare.service.CustomerService;
+
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,25 +21,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.MealShare.entity.CookEntity;
-import com.example.MealShare.entity.CustomerEntity;
-import com.example.MealShare.service.CookService;
-import com.example.MealShare.service.CustomerService;
-
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 @Controller
 public class CustomerPageController {
 
-    private static final List<String> CUISINES = List.of(
-        "Italian", "Mexican", "American", "Asian", "Mediterranean"
-    );
+    private static final List<String> CUISINES =
+            List.of("Italian", "Mexican", "American", "Asian", "Mediterranean");
 
-    private static final List<String> DIETS = List.of(
-        "Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "High-Protein"
-    );
+    private static final List<String> DIETS =
+            List.of("Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "High-Protein");
 
     private final CustomerService customerService;
     private final CookService cookService;
@@ -48,26 +46,25 @@ public class CustomerPageController {
         List<CookEntity> cooks = cookService.getAllCooks();
 
         model.addAttribute(
-            "featuredCooks",
-            cooks.subList(0, Math.min(4, cooks.size()))
+                "featuredCooks",
+                cooks.subList(0, Math.min(4, cooks.size()))
         );
 
         return "index";
     }
 
-    // show registration form
+    // customer registration
     @GetMapping("/customers/new")
     public String registerForm(Model model) {
         return formView(
-            model,
-            new CustomerEntity(),
-            new HashMap<>(),
-            false,
-            "/customers"
+                model,
+                new CustomerEntity(),
+                new HashMap<>(),
+                false,
+                "/customers"
         );
     }
 
-    // register customer
     @PostMapping("/customers")
     public String register(
             @Valid @ModelAttribute("customer") CustomerEntity customer,
@@ -79,8 +76,8 @@ public class CustomerPageController {
         Map<String, String> errors = fieldErrors(result);
 
         String password = customer.getPassword() == null
-            ? ""
-            : customer.getPassword();
+                ? ""
+                : customer.getPassword();
 
         if (!password.equals(confirmPassword)) {
             errors.put("confirmPassword", "Passwords do not match");
@@ -89,36 +86,27 @@ public class CustomerPageController {
         if (errors.isEmpty()) {
             try {
                 CustomerEntity saved = customerService.create(customer);
-
                 startSession(session, saved);
 
                 return "redirect:/customers/" + saved.getId();
 
             } catch (ResponseStatusException e) {
-                String field = e.getStatusCode().value() == 409
-                    ? "email"
-                    : "password";
-
-                errors.put(field, e.getReason());
+                errors.put(
+                        e.getStatusCode().value() == 409 ? "email" : "password",
+                        e.getReason()
+                );
             }
         }
 
-        return formView(
-            model,
-            customer,
-            errors,
-            false,
-            "/customers"
-        );
+        return formView(model, customer, errors, false, "/customers");
     }
 
-    // show login form
+    // customer login
     @GetMapping("/customers/login")
     public String loginForm() {
         return "customer-login";
     }
 
-    // log in customer
     @PostMapping("/customers/login")
     public String login(
             @RequestParam String email,
@@ -128,7 +116,6 @@ public class CustomerPageController {
 
         try {
             CustomerEntity customer = customerService.login(email, password);
-
             startSession(session, customer);
 
             return "redirect:/customers/" + customer.getId();
@@ -141,7 +128,6 @@ public class CustomerPageController {
         }
     }
 
-    // log out customer
     @GetMapping("/customers/logout")
     public String logout(
             HttpSession session,
@@ -150,8 +136,8 @@ public class CustomerPageController {
         session.invalidate();
 
         redirect.addFlashAttribute(
-            "flash",
-            "You have been logged out."
+                "flash",
+                "You have been logged out."
         );
 
         return "redirect:/";
@@ -175,7 +161,7 @@ public class CustomerPageController {
         return "customer-dashboard";
     }
 
-    // show customer settings
+    // edit customer settings
     @GetMapping("/customers/{id}/edit")
     public String editForm(
             @PathVariable Long id,
@@ -189,15 +175,14 @@ public class CustomerPageController {
         }
 
         return formView(
-            model,
-            customer,
-            new HashMap<>(),
-            true,
-            "/customers/" + id
+                model,
+                customer,
+                new HashMap<>(),
+                true,
+                "/customers/" + id
         );
     }
 
-    // update customer settings
     @PostMapping("/customers/{id}")
     public String update(
             @PathVariable Long id,
@@ -220,32 +205,31 @@ public class CustomerPageController {
                 CustomerEntity saved = customerService.update(id, customer);
 
                 session.setAttribute(
-                    "customerName",
-                    saved.getFirstName()
+                        "customerName",
+                        saved.getFirstName()
                 );
 
                 redirect.addFlashAttribute(
-                    "flash",
-                    "Your changes have been saved."
+                        "flash",
+                        "Your changes have been saved."
                 );
 
                 return "redirect:/customers/" + id;
 
             } catch (ResponseStatusException e) {
-                String field = e.getStatusCode().value() == 409
-                    ? "email"
-                    : "password";
-
-                errors.put(field, e.getReason());
+                errors.put(
+                        e.getStatusCode().value() == 409 ? "email" : "password",
+                        e.getReason()
+                );
             }
         }
 
         return formView(
-            model,
-            customer,
-            errors,
-            true,
-            "/customers/" + id
+                model,
+                customer,
+                errors,
+                true,
+                "/customers/" + id
         );
     }
 
@@ -266,8 +250,8 @@ public class CustomerPageController {
         session.invalidate();
 
         redirect.addFlashAttribute(
-            "flash",
-            "Your account was deleted."
+                "flash",
+                "Your account was deleted."
         );
 
         return "redirect:/";
@@ -282,8 +266,8 @@ public class CustomerPageController {
             Model model) {
 
         model.addAttribute(
-            "cooks",
-            cookService.search(name, cuisine, diet)
+                "cooks",
+                cookService.search(name, cuisine, diet)
         );
 
         model.addAttribute("name", name);
@@ -295,21 +279,21 @@ public class CustomerPageController {
         return "browse-cooks";
     }
 
-    // show cook profile
+    // individual cook profile
     @GetMapping("/browse-cooks/{id}")
     public String cookProfile(
             @PathVariable Long id,
             Model model) {
 
         model.addAttribute(
-            "cook",
-            cookService.getCookById(id)
+                "cook",
+                cookService.getCookById(id)
         );
 
         return "cook-profile";
     }
 
-    // handle page errors
+    // friendly error page
     @ExceptionHandler(ResponseStatusException.class)
     public String handleError(
             ResponseStatusException e,
@@ -317,16 +301,12 @@ public class CustomerPageController {
             Model model) {
 
         response.setStatus(e.getStatusCode().value());
-
-        model.addAttribute(
-            "errorMessage",
-            e.getReason()
-        );
+        model.addAttribute("errorMessage", e.getReason());
 
         return "error";
     }
 
-    // prepare customer form
+    // shared form setup
     private String formView(
             Model model,
             CustomerEntity customer,
@@ -344,21 +324,19 @@ public class CustomerPageController {
         return "customer-form";
     }
 
-    // collect validation errors
     private Map<String, String> fieldErrors(BindingResult result) {
         Map<String, String> errors = new HashMap<>();
 
         result.getFieldErrors().forEach(
-            e -> errors.putIfAbsent(
-                e.getField(),
-                e.getDefaultMessage()
-            )
+                e -> errors.putIfAbsent(
+                        e.getField(),
+                        e.getDefaultMessage()
+                )
         );
 
         return errors;
     }
 
-    // start customer session
     private void startSession(
             HttpSession session,
             CustomerEntity customer) {
@@ -367,7 +345,6 @@ public class CustomerPageController {
         session.setAttribute("customerName", customer.getFirstName());
     }
 
-    // check if customer owns the account
     private boolean isOwner(Long id, HttpSession session) {
         Object loggedIn = session.getAttribute("customerId");
 

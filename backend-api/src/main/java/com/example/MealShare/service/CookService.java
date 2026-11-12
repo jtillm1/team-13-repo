@@ -6,11 +6,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.MealShare.entity.Cook;
+import com.example.MealShare.entity.CookEntity;
 import com.example.MealShare.repository.CookRepository;
 
 @Service
 public class CookService {
+
+
+    //search for cooks by name, cuisine, and diet
+    public List<CookEntity> search(String name, String cuisine, String diet) {
+    return getAll(cuisine, diet).stream()
+            .filter(c -> name == null || name.isBlank()
+                    || c.getBusinessName().toLowerCase().contains(name.toLowerCase().trim()))
+            .toList();
+}
 
     private final CookRepository cookRepository;
 
@@ -19,7 +28,7 @@ public class CookService {
     }
 
     // Register a new cook
-    public Cook create(Cook cook) {
+    public CookEntity create(CookEntity cook) {
         if (cookRepository.existsByEmail(cook.getEmail())) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
@@ -31,20 +40,20 @@ public class CookService {
     }
 
     // Get all cooks
-    public List<Cook> getAll() {
+    public List<CookEntity> getAll() {
         return cookRepository.findAll();
     }
 
     // Get one cook by ID
-    public Cook getById(Long id) {
+    public CookEntity getById(Long id) {
         return cookRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Cook not found"));
     }
 
     // Update an existing cook
-    public Cook update(Long id, Cook updated) {
-        Cook existing = getById(id);
+    public CookEntity update(Long id, CookEntity updated) {
+        CookEntity existing = getById(id);
 
         if (cookRepository.existsByEmailAndCookIdNot(
                 updated.getEmail(), id)) {
@@ -66,7 +75,7 @@ public class CookService {
 
     // Delete an existing cook
     public void delete(Long id) {
-        Cook existing = getById(id);
+        CookEntity existing = getById(id);
         cookRepository.delete(existing);
     }
 }

@@ -18,44 +18,61 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    //US-1: register a new customer
+    // US-1: register
     public CustomerEntity create(CustomerEntity customer) {
+        checkPassword(customer.getPassword());
         if (customerRepository.existsByEmail(customer.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "That email is already registered");
         }
         customer.setId(null);
         return customerRepository.save(customer);
+    }
+
+    // US-1: log in
+    public CustomerEntity login(String email, String password) {
+        return customerRepository.findByEmail(email)
+                .filter(c -> c.getPassword().equals(password))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
     }
 
     public List<CustomerEntity> getAll() {
         return customerRepository.findAll();
     }
 
-    //view a customer profile
     public CustomerEntity getById(Long id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
     }
 
-    //update profile and preferences
+    // settings: a blank password keeps the current one
     public CustomerEntity update(Long id, CustomerEntity updated) {
         CustomerEntity existing = getById(id);
 
-        if (customerRepository.existsByEmailAndIdNot(updated.getEmail(), id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered");
+        if (!existing.getEmail().equals(updated.getEmail())
+                && customerRepository.existsByEmail(updated.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "That email is already registered");
+        }
+
+        if (updated.getPassword() != null && !updated.getPassword().isBlank()) {
+            checkPassword(updated.getPassword());
+            existing.setPassword(updated.getPassword());
         }
 
         existing.setFirstName(updated.getFirstName());
         existing.setLastName(updated.getLastName());
         existing.setEmail(updated.getEmail());
-        existing.setPassword(updated.getPassword());
         existing.setDietaryPreferences(updated.getDietaryPreferences());
         existing.setCuisinePreferences(updated.getCuisinePreferences());
         return customerRepository.save(existing);
     }
 
     public void delete(Long id) {
-        CustomerEntity existing = getById(id);
-        customerRepository.delete(existing);
+        customerRepository.delete(getById(id));
+    }
+
+    private void checkPassword(String password) {
+        if (password == null || password.length() < 6) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters");
+        }
     }
 }

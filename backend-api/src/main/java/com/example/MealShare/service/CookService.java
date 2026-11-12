@@ -14,6 +14,7 @@ import com.example.MealShare.repository.CookRepository;
 public class CookService {
 
     private final CookRepository cookRepository;
+    
 
     public CookService(CookRepository cookRepository) {
         this.cookRepository = cookRepository;
@@ -23,16 +24,8 @@ public class CookService {
         return cookRepository.findAll();
     }
 
-    // US-2: every filter is optional, blank means "no filter"
-    public List<CookEntity> search(String name, String cuisine, String diet) {
-        return cookRepository.findAll().stream()
-                .filter(c -> name == null || name.isBlank()
-                        || c.getName().toLowerCase().contains(name.toLowerCase().trim()))
-                .filter(c -> cuisine == null || cuisine.isBlank()
-                        || c.getCuisine().equalsIgnoreCase(cuisine))
-                .filter(c -> diet == null || diet.isBlank()
-                        || c.getDietaryOptions().stream().anyMatch(d -> d.equalsIgnoreCase(diet)))
-                .toList();
+    public List<CookEntity> getCooksByCuisine(String cuisine) {
+        return cookRepository.findByCuisineIgnoreCase(cuisine);
     }
 
     public CookEntity getCookById(Long id) {
@@ -50,6 +43,10 @@ public class CookService {
         if (cook.getJoinedDate() == null) {
             cook.setJoinedDate(LocalDate.now());
         }
+<<<<<<< HEAD
+=======
+        // TODO: hash cook.getPassword() (e.g. BCrypt via Spring Security) before saving
+>>>>>>> 7b6afc1249d6b6e2fa5d537914a82e55db04b97f
         return cookRepository.save(cook);
     }
 
@@ -67,7 +64,7 @@ public class CookService {
 
         // only change the password if a new one was sent
         if (updated.getPassword() != null && !updated.getPassword().isBlank()) {
-            existing.setPassword(updated.getPassword());
+            existing.setPassword(updated.getPassword()); // TODO: hash this too
         }
         return cookRepository.save(existing);
     }
@@ -79,4 +76,11 @@ public class CookService {
         }
         cookRepository.deleteById(id);
     }
+
+    
+    
+
+    
+
+    
 }

@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.MealShare.entity.CookEntity;
 import com.example.MealShare.service.CookService;
 
-import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping("/api/cooks")
 public class CookController {
@@ -29,11 +27,13 @@ public class CookController {
         this.cookService = cookService;
     }
 
-    // GET /api/cooks  or  GET /api/cooks?cuisine=Asian&diet=Vegan
+    // GET /api/cooks  or  GET /api/cooks?cuisine=Asian
     @GetMapping
-    public List<CookEntity> getCooks(@RequestParam(required = false) String cuisine,
-                                     @RequestParam(required = false) String diet) {
-        return cookService.search(null, cuisine, diet);
+    public List<CookEntity> getCooks(@RequestParam(required = false) String cuisine) {
+        if (cuisine != null && !cuisine.isBlank()) {
+            return cookService.getCooksByCuisine(cuisine);
+        }
+        return cookService.getAllCooks();
     }
 
     // GET /api/cooks/1
@@ -44,13 +44,13 @@ public class CookController {
 
     // POST /api/cooks
     @PostMapping
-    public ResponseEntity<CookEntity> createCook(@Valid @RequestBody CookEntity cook) {
+    public ResponseEntity<CookEntity> createCook(@RequestBody CookEntity cook) {
         return ResponseEntity.status(HttpStatus.CREATED).body(cookService.createCook(cook));
     }
 
     // PUT /api/cooks/1
     @PutMapping("/{id}")
-    public CookEntity updateCook(@PathVariable Long id, @Valid @RequestBody CookEntity cook) {
+    public CookEntity updateCook(@PathVariable Long id, @RequestBody CookEntity cook) {
         return cookService.updateCook(id, cook);
     }
 

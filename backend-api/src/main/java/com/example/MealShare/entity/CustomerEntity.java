@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -12,10 +13,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "customers")
@@ -32,21 +33,20 @@ public class CustomerEntity {
     private String lastName;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Email must be valid")
+    @Email(message = "Enter a valid email address")
     @Column(unique = true)
     private String email;
 
-    //WRITE_ONLY means the password can be sent in, but is never returned in JSON
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    // checked in the service so the settings form can leave it blank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    //EAGER so the lists load before the session closes (open-in-view is false)
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "customer_dietary_preferences", joinColumns = @JoinColumn(name = "customer_id"))
     private List<String> dietaryPreferences = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "customer_cuisine_preferences", joinColumns = @JoinColumn(name = "customer_id"))
     private List<String> cuisinePreferences = new ArrayList<>();
 
     public CustomerEntity() {

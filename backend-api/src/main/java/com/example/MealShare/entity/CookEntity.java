@@ -40,7 +40,7 @@ public class CookEntity {
     @Column(name = "dietary_option")
     private List<String> dietaryOptions = new ArrayList<>();
 
-    private double rating;
+    private Double rating;
     private String imageUrl;
     private LocalDate joinedDate;
 
@@ -105,12 +105,12 @@ public class CookEntity {
                 : new ArrayList<>(dietaryOptions);
     }
 
-    public double getRating() {
-        return rating;
+    public Double getRating() {
+    return rating;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
+    public void setRating(Double rating) {
+    this.rating = rating;
     }
 
     public String getImageUrl() {

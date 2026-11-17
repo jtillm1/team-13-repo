@@ -1,4 +1,3 @@
-
 package com.example.MealShare.controller;
 
 import java.util.HashMap;
@@ -26,18 +25,22 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+// handles browser pages and returns freemarker template names
 @Controller
 public class CustomerPageController {
 
+    // these lists fill the cuisine and diet dropdown menus on the website
     private static final List<String> CUISINES =
             List.of("Italian", "Mexican", "American", "Asian", "Mediterranean");
 
     private static final List<String> DIETS =
             List.of("Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "High-Protein");
 
+    // services contain the actual customer and cook operations
     private final CustomerService customerService;
     private final CookService cookService;
 
+    // spring injects both services through this constructor
     public CustomerPageController(
             CustomerService customerService,
             CookService cookService) {
@@ -45,11 +48,12 @@ public class CustomerPageController {
         this.cookService = cookService;
     }
 
-    // home page
+    // loads the home page and adds up to four cooks to the featured section
     @GetMapping("/")
     public String home(Model model) {
         List<CookEntity> cooks = cookService.getAllCooks();
 
+        // avoids an error if the database has fewer than four cooks
         model.addAttribute(
                 "featuredCooks",
                 cooks.subList(0, Math.min(4, cooks.size()))
@@ -58,7 +62,7 @@ public class CustomerPageController {
         return "index";
     }
 
-    // customer registration
+    // displays an empty registration form
     @GetMapping("/customers/new")
     public String registerForm(Model model) {
         return formView(
@@ -70,6 +74,7 @@ public class CustomerPageController {
         );
     }
 
+    // receives the registration form after the customer submits it
     @PostMapping("/customers")
     public String register(
             @Valid @ModelAttribute("customer") CustomerEntity customer,
@@ -78,24 +83,32 @@ public class CustomerPageController {
             HttpSession session,
             Model model) {
 
+        // converts validation errors into a map that the template can display
         Map<String, String> errors = fieldErrors(result);
 
+        // safely handles a missing password before comparing it
         String password = customer.getPassword() == null
                 ? ""
                 : customer.getPassword();
 
+        // checks that the confirmation field matches the original password
         if (!password.equals(confirmPassword)) {
             errors.put("confirmPassword", "Passwords do not match");
         }
 
+        // only try to save the customer when the form has no validation errors
         if (errors.isEmpty()) {
             try {
                 CustomerEntity saved = customerService.create(customer);
+
+                // remembers the new customer's id and name for this browser session
                 startSession(session, saved);
 
+                // sends the browser to the new customer's dashboard
                 return "redirect:/customers/" + saved.getId();
 
             } catch (ResponseStatusException e) {
+                // shows duplicate-email or other service errors beside the form
                 errors.put(
                         e.getStatusCode().value() == 409 ? "email" : "password",
                         e.getReason()
@@ -103,15 +116,17 @@ public class CustomerPageController {
             }
         }
 
+        // reloads the form with the customer's entered values and any errors
         return formView(model, customer, errors, false, "/customers");
     }
 
-    // customer login
+    // displays the customer login page
     @GetMapping("/customers/login")
     public String loginForm() {
         return "customer-login";
     }
 
+    // checks the submitted login details and starts a session when valid
     @PostMapping("/customers/login")
     public String login(
             @RequestParam String email,
@@ -126,6 +141,7 @@ public class CustomerPageController {
             return "redirect:/customers/" + customer.getId();
 
         } catch (ResponseStatusException e) {
+            // keeps the email in the form and displays the login error
             model.addAttribute("loginError", e.getReason());
             model.addAttribute("email", email);
 
@@ -133,6 +149,7 @@ public class CustomerPageController {
         }
     }
 
+    // logs the customer out by clearing their current session
     @GetMapping("/customers/logout")
     public String logout(
             HttpSession session,
@@ -140,15 +157,13 @@ public class CustomerPageController {
 
         session.invalidate();
 
-        redirect.addFlashAttribute(
-                "flash",
-                "You have been logged out."
-        );
+        // flash attributes appear once on the next page after the redirect
+        redirect.addFlashAttribute("flash", "You have been logged out.");
 
         return "redirect:/";
     }
 
-    // customer dashboard
+    // loads a customer's dashboard, but only lets that customer view their own account
     @GetMapping("/customers/{id}")
     public String dashboard(
             @PathVariable Long id,
@@ -157,16 +172,16 @@ public class CustomerPageController {
 
         CustomerEntity customer = customerService.getById(id);
 
+        // sends visitors to login if the session does not belong to this customer
         if (!isOwner(id, session)) {
             return "redirect:/customers/login";
         }
 
         model.addAttribute("customer", customer);
-
         return "customer-dashboard";
     }
 
-    // edit customer settings
+    // displays the edit form for the signed-in customer's account
     @GetMapping("/customers/{id}/edit")
     public String editForm(
             @PathVariable Long id,
@@ -175,6 +190,7 @@ public class CustomerPageController {
 
         CustomerEntity customer = customerService.getById(id);
 
+        // prevents one customer from opening another customer's edit page
         if (!isOwner(id, session)) {
             return "redirect:/customers/login";
         }
@@ -188,6 +204,7 @@ public class CustomerPageController {
         );
     }
 
+    // receives changes submitted from the customer settings form
     @PostMapping("/customers/{id}")
     public String update(
             @PathVariable Long id,
@@ -197,6 +214,7 @@ public class CustomerPageController {
             RedirectAttributes redirect,
             Model model) {
 
+        // confirms the customer record exists before attempting the update
         customerService.getById(id);
 
         if (!isOwner(id, session)) {
@@ -209,11 +227,10 @@ public class CustomerPageController {
             try {
                 CustomerEntity saved = customerService.update(id, customer);
 
-                session.setAttribute(
-                        "customerName",
-                        saved.getFirstName()
-                );
+                // updates the name stored in the current session
+                session.setAttribute("customerName", saved.getFirstName());
 
+                // displays a one-time success message after redirecting
                 redirect.addFlashAttribute(
                         "flash",
                         "Your changes have been saved."
@@ -222,6 +239,7 @@ public class CustomerPageController {
                 return "redirect:/customers/" + id;
 
             } catch (ResponseStatusException e) {
+                // puts service errors beside the field that most likely caused them
                 errors.put(
                         e.getStatusCode().value() == 409 ? "email" : "password",
                         e.getReason()
@@ -229,6 +247,7 @@ public class CustomerPageController {
             }
         }
 
+        // keeps the form open and displays validation errors
         return formView(
                 model,
                 customer,
@@ -238,7 +257,7 @@ public class CustomerPageController {
         );
     }
 
-    // delete customer account
+    // deletes the signed-in customer's account
     @PostMapping("/customers/{id}/delete")
     public String delete(
             @PathVariable Long id,
@@ -247,6 +266,7 @@ public class CustomerPageController {
 
         customerService.getById(id);
 
+        // only the owner of the account can delete it
         if (!isOwner(id, session)) {
             return "redirect:/customers/login";
         }
@@ -254,15 +274,11 @@ public class CustomerPageController {
         customerService.delete(id);
         session.invalidate();
 
-        redirect.addFlashAttribute(
-                "flash",
-                "Your account was deleted."
-        );
-
+        redirect.addFlashAttribute("flash", "Your account was deleted.");
         return "redirect:/";
     }
 
-    // browse and filter cooks
+    // shows cooks and applies any name, cuisine, or dietary filters from the url
     @GetMapping("/browse-cooks")
     public String browse(
             @RequestParam(required = false) String name,
@@ -270,11 +286,10 @@ public class CustomerPageController {
             @RequestParam(required = false) String diet,
             Model model) {
 
-        model.addAttribute(
-                "cooks",
-                cookService.search(name, cuisine, diet)
-        );
+        // asks the cook service to return only cooks matching the selected filters
+        model.addAttribute("cooks", cookService.search(name, cuisine, diet));
 
+        // sends the current filter values back so the form keeps its selections
         model.addAttribute("name", name);
         model.addAttribute("cuisine", cuisine);
         model.addAttribute("diet", diet);
@@ -284,34 +299,31 @@ public class CustomerPageController {
         return "browse-cooks";
     }
 
-    // individual cook profile
+    // displays one cook's profile page based on the id in the url
     @GetMapping("/browse-cooks/{id}")
     public String cookProfile(
             @PathVariable Long id,
             Model model) {
 
-        model.addAttribute(
-                "cook",
-                cookService.getCookById(id)
-        );
-
+        model.addAttribute("cook", cookService.getCookById(id));
         return "cook-profile";
     }
 
-    // friendly error page
+    // catches response status errors from page requests and displays the friendly error template
     @ExceptionHandler(ResponseStatusException.class)
     public String handleError(
             ResponseStatusException e,
             HttpServletResponse response,
             Model model) {
 
+        // keeps the correct http status code even though an error template is returned
         response.setStatus(e.getStatusCode().value());
         model.addAttribute("errorMessage", e.getReason());
 
         return "error";
     }
 
-    // shared form setup
+    // shared method that prepares the model for both new and edit customer forms
     private String formView(
             Model model,
             CustomerEntity customer,
@@ -329,6 +341,7 @@ public class CustomerPageController {
         return "customer-form";
     }
 
+    // collects field validation messages into a map using the field name as the key
     private Map<String, String> fieldErrors(BindingResult result) {
         Map<String, String> errors = new HashMap<>();
 
@@ -342,14 +355,13 @@ public class CustomerPageController {
         return errors;
     }
 
-    private void startSession(
-            HttpSession session,
-            CustomerEntity customer) {
-
+    // stores the signed-in customer's id and first name in the browser session
+    private void startSession(HttpSession session, CustomerEntity customer) {
         session.setAttribute("customerId", customer.getId());
         session.setAttribute("customerName", customer.getFirstName());
     }
 
+    // checks whether the current session belongs to the customer in the url
     private boolean isOwner(Long id, HttpSession session) {
         Object loggedIn = session.getAttribute("customerId");
 

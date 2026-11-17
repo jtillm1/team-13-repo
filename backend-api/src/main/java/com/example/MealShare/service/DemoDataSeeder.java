@@ -2,7 +2,7 @@
 package com.example.MealShare.service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
@@ -23,72 +23,79 @@ public class DemoDataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        if (cookRepository.count() > 0) {
+        List<CookEntity> cooks = cookRepository.findAll();
+
+        // Stop if the three profiles have already been updated.
+        boolean alreadyUpdated = cooks.stream().anyMatch(
+                c -> "Sofia's Cocina".equals(c.getName()));
+
+        if (alreadyUpdated) {
             return;
         }
 
-        cookRepository.save(cook(
-                "Maria's Kitchen",
-                "maria@mealshare.demo",
-                "Italian",
-                List.of("Vegetarian", "Gluten-Free"),
-                "Home-style Italian cooking made with fresh, seasonal ingredients.",
-                4.8,
-                "/images/maria.jpg"
-        ));
+        // Only update the three existing demo cooks.
+        if (cooks.size() != 3) {
+            System.out.println(
+                    "Demo seeder skipped: expected exactly 3 cooks.");
+            return;
+        }
 
-        cookRepository.save(cook(
-                "James' Meal Prep",
-                "james@mealshare.demo",
-                "American",
-                List.of("High-Protein", "Dairy-Free"),
-                "Weekly meal prep built for people who train hard.",
-                4.7,
-                "/images/james.jpg"
-        ));
+        // Keep existing database IDs and order records by ID.
+        cooks.sort(Comparator.comparing(CookEntity::getId));
 
-        cookRepository.save(cook(
+        updateCook(
+                cooks.get(0),
                 "Sofia's Cocina",
-                "sofia@mealshare.demo",
                 "Mexican",
                 List.of("Vegetarian"),
                 "Bright, veggie-forward Mexican dishes made from scratch.",
                 4.9,
                 "/images/sofia.jpg"
-        ));
+        );
 
-        cookRepository.save(cook(
+        updateCook(
+                cooks.get(1),
                 "Hana's Kitchen",
-                "hana@mealshare.demo",
                 "Asian",
                 List.of("Vegan", "Gluten-Free"),
                 "Plant-based Asian comfort food, gluten-free.",
                 4.8,
                 "/images/hana.jpg"
-        ));
+        );
+
+        updateCook(
+                cooks.get(2),
+                "James' Meal Prep",
+                "American",
+                List.of("High-Protein", "Dairy-Free"),
+                "Weekly meal prep built for people who train hard.",
+                4.7,
+                "/images/james.jpg"
+        );
+
+        cookRepository.saveAll(cooks);
+
+        System.out.println("MealShare demo cooks updated!");
     }
 
-    private CookEntity cook(
+    private void updateCook(
+            CookEntity cook,
             String name,
-            String email,
             String cuisine,
             List<String> diets,
             String description,
             double rating,
             String imageUrl) {
 
-        CookEntity cook = new CookEntity();
-
         cook.setName(name);
-        cook.setEmail(email);
-        cook.setPassword("demo1234");
         cook.setCuisine(cuisine);
-        cook.setDietaryOptions(new ArrayList<>(diets));
+        cook.setDietaryOptions(diets);
         cook.setDescription(description);
         cook.setRating(rating);
         cook.setImageUrl(imageUrl);
-        cook.setJoinedDate(LocalDate.now());
 
-        return cook;
+        if (cook.getJoinedDate() == null) {
+            cook.setJoinedDate(LocalDate.now());
+        }
     }
 }

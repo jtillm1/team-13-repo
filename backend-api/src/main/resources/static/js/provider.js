@@ -1,157 +1,265 @@
 // provider.js
-// Shared helpers for the MealShare PROVIDER (home cook / caterer) side.
-// There's no backend for this prototype, so everything is faked with
-// localStorage - same approach as the customer side (see js/customer.js).
+// shared helper functions for the mealshare provider side.
+// providers are the home cooks or caterers using the platform.
+// this prototype uses localstorage instead of a real backend.
 
+// these constants hold the localstorage names used throughout the file
 const PROVIDERS_KEY = "mealshare_providers";
 const CURRENT_PROVIDER_KEY = "mealshare_currentProviderId";
 const MENU_ITEMS_KEY = "mealshare_menuItems";
 const REVIEWS_KEY = "mealshare_reviews";
 const ORDERS_KEY = "mealshare_orders";
 
-/* ---------------- Providers / auth ---------------- */
+/* ---------------- providers / authentication ---------------- */
 
+// gets all provider accounts saved in localstorage
 function getProviders() {
   return JSON.parse(localStorage.getItem(PROVIDERS_KEY)) || [];
 }
 
+// saves the provider list back into localstorage
 function saveProviders(providers) {
   localStorage.setItem(PROVIDERS_KEY, JSON.stringify(providers));
 }
 
+// gets the provider who is currently signed in
 function getCurrentProvider() {
   const id = localStorage.getItem(CURRENT_PROVIDER_KEY);
+
+  // if there is no saved provider id, nobody is signed in
   if (!id) return null;
-  return getProviders().find(function (p) { return p.id === id; }) || null;
+
+  // searches the provider list for the matching id
+  return getProviders().find(function (p) {
+    return p.id === id;
+  }) || null;
 }
 
+// saves the id of the provider who just signed in
 function setCurrentProvider(id) {
   localStorage.setItem(CURRENT_PROVIDER_KEY, id);
 }
 
+// logs the provider out by removing their saved session id
 function logoutProvider() {
   localStorage.removeItem(CURRENT_PROVIDER_KEY);
 }
 
-// Create a new provider account (business name / email / password).
-// Returns the new provider's id.
+// creates a new provider account
+// returns the id assigned to the new provider
 function registerProvider(provider) {
   const providers = getProviders();
+
+  // creates a unique id using the current timestamp
   provider.id = "p_" + Date.now();
+
+  // new providers must complete their profile later
   provider.profileComplete = false;
+
+  // adds the new provider to the existing list
   providers.push(provider);
+
+  // saves the updated list
   saveProviders(providers);
+
+  // automatically signs in the new provider
   setCurrentProvider(provider.id);
+
   return provider.id;
 }
 
+// searches for a provider using their email address
 function findProviderByEmail(email) {
   return getProviders().find(function (p) {
+    // ignores uppercase and lowercase differences in email addresses
     return p.email.toLowerCase() === email.toLowerCase();
   }) || null;
 }
 
-// US-5: save/update the catering profile for the given provider id.
+// updates the provider's catering profile (US-5)
 function updateProvider(id, updates) {
   const providers = getProviders();
-  const idx = providers.findIndex(function (p) { return p.id === id; });
+
+  // finds the position of the provider in the array
+  const idx = providers.findIndex(function (p) {
+    return p.id === id;
+  });
+
+  // returns null if no provider with that id exists
   if (idx === -1) return null;
-  providers[idx] = Object.assign({}, providers[idx], updates, { profileComplete: true });
+
+  // combines the old provider information with the new information
+  // also marks the profile as complete
+  providers[idx] = Object.assign(
+    {},
+    providers[idx],
+    updates,
+    { profileComplete: true }
+  );
+
+  // saves the updated provider list
   saveProviders(providers);
+
   return providers[idx];
 }
 
-// Call this at the top of every protected provider page. Bounces back to
-// login if nobody is signed in.
+// checks whether a provider is signed in before allowing access to a page
 function requireProviderAuth() {
   const provider = getCurrentProvider();
+
+  // sends the user to the login page if nobody is signed in
   if (!provider) {
     window.location.href = "login.html";
     return null;
   }
+
   return provider;
 }
 
-/* ---------------- Menu items + pricing (US-6) ---------------- */
+/* ---------------- menu items + pricing (US-6) ---------------- */
 
+// gets every menu item saved in localstorage
 function getAllMenuItems() {
   return JSON.parse(localStorage.getItem(MENU_ITEMS_KEY)) || [];
 }
 
+// saves the complete menu item list
 function saveAllMenuItems(items) {
   localStorage.setItem(MENU_ITEMS_KEY, JSON.stringify(items));
 }
 
+// gets only the menu items belonging to one provider
 function getMenuItems(providerId) {
-  return getAllMenuItems().filter(function (m) { return m.providerId === providerId; });
+  return getAllMenuItems().filter(function (m) {
+    return m.providerId === providerId;
+  });
 }
 
+// adds a new menu item
 function addMenuItem(item) {
   const items = getAllMenuItems();
+
+  // assigns a unique id to the new menu item
   item.id = "m_" + Date.now();
+
+  // adds the item to the list
   items.push(item);
+
+  // saves the updated list
   saveAllMenuItems(items);
+
   return item;
 }
 
+// updates an existing menu item
 function updateMenuItem(id, updates) {
   const items = getAllMenuItems();
-  const idx = items.findIndex(function (m) { return m.id === id; });
+
+  // finds the menu item that matches the given id
+  const idx = items.findIndex(function (m) {
+    return m.id === id;
+  });
+
+  // returns null if the item does not exist
   if (idx === -1) return null;
+
+  // combines the existing item with the updated information
   items[idx] = Object.assign({}, items[idx], updates);
+
+  // saves the updated menu list
   saveAllMenuItems(items);
+
   return items[idx];
 }
 
+// deletes a menu item using its id
 function deleteMenuItem(id) {
-  saveAllMenuItems(getAllMenuItems().filter(function (m) { return m.id !== id; }));
+  // keeps every menu item except the one being deleted
+  saveAllMenuItems(
+    getAllMenuItems().filter(function (m) {
+      return m.id !== id;
+    })
+  );
 }
 
-/* ---------------- Reviews (US-7) ---------------- */
+/* ---------------- reviews (US-7) ---------------- */
 
+// gets every review saved in localstorage
 function getAllReviews() {
   return JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
 }
 
+// saves the complete review list
 function saveAllReviews(reviews) {
   localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
 }
 
+// gets only the reviews belonging to one provider
 function getReviews(providerId) {
-  return getAllReviews().filter(function (r) { return r.providerId === providerId; });
+  return getAllReviews().filter(function (r) {
+    return r.providerId === providerId;
+  });
 }
 
+// lets a provider respond to a customer review
 function replyToReview(reviewId, replyText) {
   const reviews = getAllReviews();
-  const idx = reviews.findIndex(function (r) { return r.id === reviewId; });
+
+  // finds the review that the provider wants to reply to
+  const idx = reviews.findIndex(function (r) {
+    return r.id === reviewId;
+  });
+
+  // returns null if the review cannot be found
   if (idx === -1) return null;
+
+  // saves the provider's response
   reviews[idx].reply = replyText;
+
+  // records the date the response was submitted
   reviews[idx].replyDate = new Date().toISOString().slice(0, 10);
+
+  // saves the updated reviews
   saveAllReviews(reviews);
+
   return reviews[idx];
 }
 
-/* ---------------- Orders + payment status (US-8) ---------------- */
+/* ---------------- orders + payment status (US-8) ---------------- */
 
+// gets every order saved in localstorage
 function getAllOrders() {
   return JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
 }
 
+// saves the complete order list
 function saveAllOrders(orders) {
   localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
 }
 
+// gets only the orders belonging to one provider
 function getOrders(providerId) {
-  return getAllOrders().filter(function (o) { return o.providerId === providerId; });
+  return getAllOrders().filter(function (o) {
+    return o.providerId === providerId;
+  });
 }
 
-/* ---------------- Demo data ---------------- */
-// The customer side of the prototype doesn't generate real orders/reviews
-// yet, so we seed a couple of sample ones the first time a provider visits
-// their dashboard - just so US-7 and US-8 have something to show.
+/* ---------------- demo data ---------------- */
+
+// the customer side of the prototype does not create real orders or reviews yet.
+// these sample records give the provider dashboard something to display.
+// this happens the first time a provider visits their dashboard.
+
+// adds sample reviews and orders if the provider does not already have any
 function seedDemoDataIfNeeded(providerId) {
   const reviews = getAllReviews();
-  if (!reviews.some(function (r) { return r.providerId === providerId; })) {
+
+  // checks whether this provider already has reviews
+  if (!reviews.some(function (r) {
+    return r.providerId === providerId;
+  })) {
+
+    // adds two sample reviews for this provider
     saveAllReviews(reviews.concat([
       {
         id: "r_" + Date.now(),
@@ -175,13 +283,25 @@ function seedDemoDataIfNeeded(providerId) {
   }
 
   const orders = getAllOrders();
-  if (!orders.some(function (o) { return o.providerId === providerId; })) {
+
+  // checks whether this provider already has orders
+  if (!orders.some(function (o) {
+    return o.providerId === providerId;
+  })) {
+
+    // adds two sample orders for this provider
     saveAllOrders(orders.concat([
       {
         id: "o_" + Date.now(),
         providerId: providerId,
         customerName: "Alexis P.",
-        items: [{ name: "Mediterranean Bowl", qty: 2, price: 12.5 }],
+        items: [
+          {
+            name: "Mediterranean Bowl",
+            qty: 2,
+            price: 12.5
+          }
+        ],
         total: 25.0,
         status: "Paid",
         date: "2026-09-18"
@@ -190,7 +310,13 @@ function seedDemoDataIfNeeded(providerId) {
         id: "o_" + (Date.now() + 1),
         providerId: providerId,
         customerName: "Marcus T.",
-        items: [{ name: "Weekly Family Pack", qty: 1, price: 48.0 }],
+        items: [
+          {
+            name: "Weekly Family Pack",
+            qty: 1,
+            price: 48.0
+          }
+        ],
         total: 48.0,
         status: "Unpaid",
         date: "2026-09-20"

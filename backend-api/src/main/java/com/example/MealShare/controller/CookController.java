@@ -44,6 +44,12 @@ public class CookController {
         return cookService.getCookById(id);
     }
 
+    // gets every cook from the database
+    @GetMapping
+    public List<CookEntity> getAllCooks() {
+    return cookService.getAllCooks();
+}
+
     // creates a new cook from the json data sent in the request body
     // returns status 201 to show that the record was created
     @PostMapping
